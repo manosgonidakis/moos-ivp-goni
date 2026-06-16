@@ -1,7 +1,6 @@
-
 //-------------------------------------------------
 // NAME: M. Benjamin, MIT CSAIL
-// FILE: bravo.moos
+// FILE: alpha.moos
 //-------------------------------------------------
 
 ServerHost   = localhost
@@ -32,7 +31,6 @@ ProcessConfig = ANTLER
   Run = uProcessWatch	@ NewConsole = false
   Run = pNodeReporter	@ NewConsole = false
   Run = pRealm	      @ NewConsole = false
-  Run = pOdometry @ NewConsole = false
 }
 
 //------------------------------------------
@@ -82,11 +80,8 @@ ProcessConfig = uSimMarineV22
 {
   AppTick  	= 4
   CommsTick	= 4
-  buoyancy_rate        = 0.15
-  max_depth_rate       = 2.5
-  max_depth_rate_speed = 2.0
 
-  start_pos     = x=0, y=-20, heading=180, speed=0, depth = 10
+  start_pos     = x=0, y=-20, heading=180, speed=0
   prefix        = NAV
   turn_rate     = 95
   thrust_map    = 0:0, 20:1, 40:2, 60:3, 80:4, 100:5
@@ -101,10 +96,9 @@ ProcessConfig = pHelmIvP
   AppTick    = 4
   CommsTick  = 4
 
-  behaviors  = bravo.bhv
+  behaviors  = alpha.bhv
   domain     = course:0:359:360
   domain     = speed:0:4:41
-  Domain     = depth:0:50:51    
 }
 
 //------------------------------------------
@@ -116,7 +110,7 @@ ProcessConfig = pMarinePIDV22
   CommsTick  = 20
 
   verbose       = true
-  depth_control = true
+  depth_control = false
 
   // SIM_INSTABILITY = 20
 
@@ -132,26 +126,13 @@ ProcessConfig = pMarinePIDV22
   speed_pid_ki		 = 0.0
   speed_pid_integral_limit = 0.07
 
-  // Depth PID
-  z_to_pitch_pid_kp             = 0.6
-  z_to_pitch_pid_kd             = 0.0
-  z_to_pitch_pid_ki             = 0.04
-  z_to_pitch_pid_integral_limit = 0.04
-
-//Pitch PID controller
-  pitch_pid_kp             = 1.5
-  pitch_pid_kd             = 0.3
-  pitch_pid_ki             = 0.004
-  pitch_pid_integral_limit = 0
-
   //MAXIMUMS
   maxrudder    = 100
   maxthrust    = 100
-  maxelevator  = 13
 
   // A non-zero SPEED_FACTOR overrides use of SPEED_PID
   // Will set DESIRED_THRUST = DESIRED_SPEED * SPEED_FACTOR
-  //speed_factor = 20
+  speed_factor = 20
 }
 
 //------------------------------------------
@@ -163,7 +144,6 @@ ProcessConfig = pMarineViewer
   CommsTick  = 4
 
   tiff_file            = forrest19.tif
-  vehicles_name_mode   = names+depth
 	//tiff_file            = MIT_SP.tif
 
   set_pan_x            = -90
@@ -224,15 +204,13 @@ ProcessConfig = pMarineViewer
   scope  = VIEW_POLYGON
   scope  = MVIEWER_LCLICK
   scope  = MVIEWER_RCLICK
-  scope	 = NAV_X
-  scope	 = NAV_DEPTH 
-  scope	 = NAV_PITCH
+  scope = NAV_X
 
   button_one = DEPLOY # DEPLOY=true
   button_one = MOOS_MANUAL_OVERRIDE=false # RETURN=false
   button_two = RETURN # RETURN=true
-  button_three = WEST # LOITER_REGION = west
-  button_four = EAST # LOITER_REGION = east
+  button_three = SLOWER # WPT_UPDATE=speed=1.5
+  button_four = FASTER # WPT_UPDATE=speed=3.5
   button_five = NEW_SURVEY # WPT_UPDATE= polygon = 120,-140 : 40,-120 : 40,-30
   button_six = RESET_SURVEY # WPT_UPDATE= polygon = 60,-40 : 60,-160 : 150,-160 : 180,-100 : 150,-40
 
@@ -250,18 +228,8 @@ ProcessConfig = pNodeReporter
   AppTick    = 2
   CommsTick	 = 2
 
-  platform_type   = uuv
+  platform_type   = kayak
   platform_color  = yellow
   platform_length = 4
-}
-
-//------------------------------------------
-// pOdometry config block
-ProcessConfig = pOdometry
-{
-  AppTick   = 4
-  CommsTick = 4
-
-  depth_thresh = 25    // <-- Accumulate distance only when depth > 25m!
 }
 
