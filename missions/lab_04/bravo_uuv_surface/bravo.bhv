@@ -1,0 +1,158 @@
+//--------    FILE: bravo.bhv   ------------
+
+initialize   DEPLOY = false
+initialize   RETURN = false
+initialize   LOITER_REGION = west
+initialize   SURFACE_STATE = false    
+//background_vars = NAV_X, NAV_Y, NAV_SPEED, NAV_HEADING, NAV_DEPTH
+	
+//----------------------------------------------
+Behavior = BHV_Loiter
+{
+  name                    = loiter_west
+  pwt                     = 100
+  condition               = DEPLOY = true
+  condition               = RETURN = false
+  condition               = LOITER_REGION = west   
+
+  perpetual               = true
+  duration                = 150
+  duration_idle_decay     = false                                
+  
+  endflag                 = LOITER_REGION = east   // go to east
+  
+  polygon                 = format=radial, x=100, y=-75, radius=30, pts=8
+  speed                   = 2.5
+  clockwise               = false
+  capture_radius          = 5.0
+  slip_radius             = 15.0
+}
+
+//----------------------------------------------
+Behavior = BHV_Loiter
+{
+  name                    = loiter_east
+  pwt                     = 100
+  condition               = DEPLOY = true
+  condition               = RETURN = false
+  condition               = LOITER_REGION = east   
+
+  perpetual               = true
+  duration                = 150
+  duration_idle_decay     = false
+  
+  endflag                 = LOITER_REGION = west   // return to west
+
+  polygon                 = format=radial, x=160, y=-50, radius=20, pts=8
+  speed                   = 2.5
+  clockwise               = false
+  capture_radius          = 5.0
+  slip_radius             = 15.0
+}
+
+//----------------------------------------------
+Behavior=BHV_Waypoint
+{
+  name               = waypt_return
+  pwt                = 100
+  condition          = RETURN = true
+  condition          = DEPLOY = true
+  perpetual          = true
+  endflag            = RETURN = false
+  endflag            = DEPLOY = false
+  endflag            = MISSION = complete
+	
+  speed              = 2.0
+  capture_radius     = 2.0   // 
+  slip_radius        = 8.0    
+  points             = 0,0
+}
+
+//----------------------------------------------
+Behavior=BHV_ConstantSpeed
+{
+  name      = const_speed
+  pwt       = 200
+  condition = SPD=true
+  condition = DEPLOY = true
+  perpetual = true
+  updates   = SPEED_UPDATE
+  endflag   = SPD = false
+
+  speed     = 0.5
+  duration  = 10
+  duration_reset = CONST_SPD_RESET=true
+}
+Behavior = BHV_ConstantDepth
+{
+  name       = depth_west
+  pwt        = 100
+  // enable when loiter wet
+  condition  = DEPLOY = true
+  condition  = RETURN = false
+  condition  = LOITER_REGION = west
+  condition  = SURFACE_STATE = false   
+
+  perpetual  = true
+
+  depth      = 30            // 30 meter depth west
+}
+
+//----------------------
+Behavior = BHV_ConstantDepth
+{
+  name       = depth_east
+  pwt        = 100
+  // enable when loiter east
+  condition  = DEPLOY = true
+  condition  = RETURN = false
+  condition  = LOITER_REGION = east
+  condition  = SURFACE_STATE = false
+
+  perpetual  = true
+
+  depth      = 10            // 10 meter depth east
+}
+
+//----------------------
+Behavior = BHV_Timer
+{
+  name                  = dive_timer
+  pwt                   = 100
+  condition             = DEPLOY = true
+  condition             = RETURN = false
+  condition             = SURFACE_STATE = false // Τρέχει μόνο όσο είμαστε κάτω
+  perpetual             = true
+
+  duration              = 200                   // every 200 s
+  duration_idle_decay   = false                 // freeze if deploy=false
+  endflag               = SURFACE_STATE = true  //Time to dive
+}
+
+//--------------------
+
+Behavior = BHV_Timer
+{
+  name                  = surface_timer
+  pwt                   = 100
+  condition             = DEPLOY = true
+  condition             = RETURN = false
+  condition             = SURFACE_STATE = true  // run only on surface
+  perpetual             = true
+
+  duration              = 60                    // wait 60 sec
+  duration_idle_decay   = false
+  endflag               = SURFACE_STATE = false // Ξαναβούτα!
+}
+
+Behavior = BHV_ConstantDepth
+{
+  name                  = go_to_surface
+  pwt                   = 150                   // slightly higher pwt 
+  condition             = DEPLOY = true
+  condition             = RETURN = false
+  condition             = SURFACE_STATE = true  // active only on surface
+  perpetual             = true
+
+  depth                 = 0                     // go to surface
+}

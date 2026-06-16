@@ -1,7 +1,7 @@
 /************************************************************/
-/* NAME: Emmanouil                                       */
-/* ORGN: MIT, Cambridge MA                               */
-/* FILE: Odometry.cpp                                    */
+/* NAME: Emmanouil                                          */
+/* ORGN: MIT, Cambridge MA                                  */
+/* FILE: Odometry.cpp                                       */
 /************************************************************/
 
 #include <iterator>
@@ -16,13 +16,16 @@ using namespace std;
 // Constructor()
 Odometry::Odometry()
 {
-  m_first_reading  = true;
-  m_current_x      = 0.0;
-  m_current_y      = 0.0;
-  m_previous_x     = 0.0;
-  m_previous_y     = 0.0;
-  m_total_distance = 0.0;
-  m_last_nav_time  = 0.0;
+  m_first_reading          = true;
+  m_current_x              = 0.0;
+  m_current_y              = 0.0;
+  m_previous_x             = 0.0;
+  m_previous_y             = 0.0;
+  m_total_distance         = 0.0;
+  m_last_nav_time          = 0.0;
+  m_depth_thresh           = 0.0; // <-- ΔΙΟΡΘΩΘΗΚΕ: Μπήκε το ';'
+  m_odometry_dist_at_depth = 0.0;
+  m_nav_depth              = 0.0;
 }
 
 //---------------------------------------------------------
@@ -45,12 +48,14 @@ bool Odometry::OnNewMail(MOOSMSG_LIST &NewMail)
     if (key == "NAV_X") {
       m_current_x = msg.GetDouble();
       m_last_nav_time = msg.GetTime(); 
-      cout << "nav_x: " << m_current_x << endl;
     }
     else if(key == "NAV_Y") {
       m_current_y = msg.GetDouble();
       m_last_nav_time = msg.GetTime();
-      cout << "nav_y: " << m_current_y << endl; // <-- ΔΙΟΡΘΩΘΗΚΕ: Μπήκε το ';'
+    }
+    // 📌 ΠΡΟΣΘΕΣΕ ΑΥΤΟ: Διαβάζουμε το βάθος από το UUV
+    else if(key == "NAV_DEPTH") {
+      m_nav_depth = msg.GetDouble();
     }
     else if(key != "APPCAST_REQ") {
       reportRunWarning("Unhandled Mail: " + key);
@@ -73,7 +78,7 @@ bool Odometry::Iterate()
 {
   AppCastingMOOSApp::Iterate();
 
-  // Έλεγχος Staleness (Άσκηση 5.2)
+  // Staleness
   double current_moos_time = MOOSTime();
   if (m_last_nav_time > 0 && (current_moos_time - m_last_nav_time >= 10.0)) {
     reportRunWarning("NAV data is stale! No update for over 10 seconds.");
@@ -93,13 +98,20 @@ bool Odometry::Iterate()
     double step_distance = hypot(dx, dy);
 
     m_total_distance += step_distance;
+
+    // 📌 ΔΙΟΡΘΩΘΗΚΕ: Χρήση του step_distance αντί του distance_increment
+    if (m_nav_depth > m_depth_thresh) {
+        m_odometry_dist_at_depth += step_distance;
+    }
+
+    // Δημοσίευση της νέας τιμής στη MOOSDB
+    Notify("ODOMETRY_DIST_AT_DEPTH", m_odometry_dist_at_depth);
   }
 
   m_previous_x = m_current_x;
   m_previous_y = m_current_y;
 
   Notify("ODOMETRY_DIST", m_total_distance);
-  cout << "odometry_dist calculated: " << m_total_distance << endl; //
 
   AppCastingMOOSApp::PostReport();
   return(true);
@@ -107,7 +119,6 @@ bool Odometry::Iterate()
 
 //---------------------------------------------------------
 // Procedure: OnStartUp()
-// <-- ΔΙΟΡΘΩΘΗΚΕ: Καθαρίστηκε το περίεργο σχόλιο της γραμμής 119!
 bool Odometry::OnStartUp()
 {
   AppCastingMOOSApp::OnStartUp();
@@ -122,13 +133,18 @@ bool Odometry::OnStartUp()
     string orig  = *p;
     string line  = *p;
     string param = tolower(biteStringX(line, '='));
-    string value = line;
+    string value = stripBlankEnds(line);
 
     bool handled = false;
     if(param == "foo") {
       handled = true;
     }
     else if(param == "bar") {
+      handled = true;
+    }
+    // 📌 ΠΡΟΣΘΕΣΕ ΑΥΤΟ: Διαβάζει σωστά το depth_thresh από το .moos αρχείο
+    else if(param == "depth_thresh") {
+      m_depth_thresh = atof(value.c_str());
       handled = true;
     }
 
@@ -147,6 +163,7 @@ void Odometry::registerVariables()
   AppCastingMOOSApp::RegisterVariables();
   Register("NAV_X", 0);
   Register("NAV_Y", 0);
+  Register("NAV_DEPTH", 0); // <-- ΠΡΟΣΘΕΣΕ ΑΥΤΟ!
 }
 
 //------------------------------------------------------------
@@ -155,6 +172,9 @@ bool Odometry::buildReport()
 {
   m_msgs << "============================================" << endl;
   m_msgs << "pOdometry Mission Status                    " << endl;
+  m_msgs << "============================================" << endl;
+  m_msgs << "Distance at Depth Threshold: " << m_odometry_dist_at_depth << " m" << endl;
+  m_msgs << "Depth Threshold Set: " << m_depth_thresh << " m" << endl;
   m_msgs << "============================================" << endl;
   
   ACTable actab(3);

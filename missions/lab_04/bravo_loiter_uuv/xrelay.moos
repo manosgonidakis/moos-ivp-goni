@@ -1,0 +1,38 @@
+ServerHost = localhost
+ServerPort = 9000
+Community  = alpha
+
+//------------------------------------------
+// Antler configuration  block
+ProcessConfig = ANTLER
+{
+  MSBetweenLaunches = 200
+
+  Run = MOOSDB	 @ NewConsole = true
+  Run = pXRelay	 @ NewConsole = false ~ pXRelay_PEARS
+  Run = pXRelay	 @ NewConsole = false ~ pXRelay_APPLES
+}
+
+//------------------------------------------
+// pXRelay_APPLES config block
+
+ProcessConfig = pXRelay_APPLES
+{
+  AppTick	= 10
+  CommsTick	= 10
+
+  incoming_var  = APPLES
+  outgoing_var  = PEARS
+}
+
+//------------------------------------------
+// pXRelay_PEARS config block
+
+ProcessConfig = pXRelay_PEARS
+{
+  AppTick	= 10
+  CommsTick	= 10
+
+  incoming_var  = PEARS
+  outgoing_var  = APPLES
+}

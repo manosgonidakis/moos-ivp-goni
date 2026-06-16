@@ -35,6 +35,9 @@ class Odometry : public AppCastingMOOSApp
    double m_previous_y;
    double m_total_distance;
    double m_last_nav_time; // Για το Staleness Check
+   double m_depth_thresh;          // Read Limit
+   double m_odometry_dist_at_depth; //distance from lower limit
+   double m_nav_depth;
 };
 
 #endif
