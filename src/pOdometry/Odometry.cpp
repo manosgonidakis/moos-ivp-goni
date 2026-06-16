@@ -158,8 +158,11 @@ bool Odometry::buildReport()
   m_msgs << "============================================" << endl;
   
   // Τυπώνουμε τη μεταβλητή μας με δύο δεκαδικά ψηφία
-  m_msgs << "Total Distance Traveled: " << m_total_distance << " meters." << endl;
-
+m_msgs << "=============================================" << endl;
+  m_msgs << " USV Navigation Status                      " << endl;
+  m_msgs << "=============================================" << endl;
+  m_msgs << " Total Distance Traveled: " << m_total_distance << " meters." << endl;
+  m_msgs << "=============================================" << endl;
   ACTable actab(4);
   actab << "Alpha | Bravo | Charlie | Delta";
   actab.addHeaderLines();
