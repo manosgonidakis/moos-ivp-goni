@@ -1,11 +1,11 @@
 /************************************************************/
-/*    NAME: Jane Doe                                              */
-/*    ORGN: MIT, Cambridge MA                               */
-/*    FILE: Odometry.cpp                                        */
-/*    DATE: December 29th, 1963                             */
+/* NAME: Emmanouil                                       */
+/* ORGN: MIT, Cambridge MA                               */
+/* FILE: Odometry.cpp                                    */
 /************************************************************/
 
 #include <iterator>
+#include <cmath>
 #include "MBUtils.h"
 #include "ACTable.h"
 #include "Odometry.h"
@@ -14,27 +14,25 @@ using namespace std;
 
 //---------------------------------------------------------
 // Constructor()
-
 Odometry::Odometry()
 {
-m_first_reading   = true;
-  m_current_x       = 0.0;
-  m_current_y       = 0.0;
-  m_previous_x      = 0.0;
-  m_previous_y      = 0.0;
-  m_total_distance  = 0.0;
+  m_first_reading  = true;
+  m_current_x      = 0.0;
+  m_current_y      = 0.0;
+  m_previous_x     = 0.0;
+  m_previous_y     = 0.0;
+  m_total_distance = 0.0;
+  m_last_nav_time  = 0.0;
 }
 
 //---------------------------------------------------------
 // Destructor
-
 Odometry::~Odometry()
 {
 }
 
 //---------------------------------------------------------
 // Procedure: OnNewMail()
-
 bool Odometry::OnNewMail(MOOSMSG_LIST &NewMail)
 {
   AppCastingMOOSApp::OnNewMail(NewMail);
@@ -44,23 +42,25 @@ bool Odometry::OnNewMail(MOOSMSG_LIST &NewMail)
     CMOOSMsg &msg = *p;
     string key    = msg.GetKey();
 
-   if (key == "NAV_X") {
-    m_current_x = msg.GetDouble();//δεκαδικό αριθμό-> m_current_x
-   }
-    else if(key =="NAV_Y") {
-      m_current_y =msg.GetDouble(); //δεκαδικό αριθμό-> m_current_y
-   }
-
-     else if(key != "APPCAST_REQ") // handled by AppCastingMOOSApp
-       reportRunWarning("Unhandled Mail: " + key);
-   }
-	
+    if (key == "NAV_X") {
+      m_current_x = msg.GetDouble();
+      m_last_nav_time = msg.GetTime(); 
+      cout << "nav_x: " << m_current_x << endl;
+    }
+    else if(key == "NAV_Y") {
+      m_current_y = msg.GetDouble();
+      m_last_nav_time = msg.GetTime();
+      cout << "nav_y: " << m_current_y << endl; // <-- ΔΙΟΡΘΩΘΗΚΕ: Μπήκε το ';'
+    }
+    else if(key != "APPCAST_REQ") {
+      reportRunWarning("Unhandled Mail: " + key);
+    }
+  }
    return(true);
 }
 
 //---------------------------------------------------------
 // Procedure: OnConnectToServer()
-
 bool Odometry::OnConnectToServer()
 {
    registerVariables();
@@ -69,15 +69,19 @@ bool Odometry::OnConnectToServer()
 
 //---------------------------------------------------------
 // Procedure: Iterate()
-//            happens AppTick times per second
-//---------------------------------------------------------
-// Procedure: Iterate()
-//            happens AppTick times per second
-
 bool Odometry::Iterate()
 {
   AppCastingMOOSApp::Iterate();
 
+  // Έλεγχος Staleness (Άσκηση 5.2)
+  double current_moos_time = MOOSTime();
+  if (m_last_nav_time > 0 && (current_moos_time - m_last_nav_time >= 10.0)) {
+    reportRunWarning("NAV data is stale! No update for over 10 seconds.");
+  } else {
+    retractRunWarning("NAV data is stale! No update for over 10 seconds.");
+  }
+
+  // Υπολογισμός Ευκλείδη
   if (m_first_reading) {
     m_previous_x = m_current_x;
     m_previous_y = m_current_y;
@@ -95,14 +99,15 @@ bool Odometry::Iterate()
   m_previous_y = m_current_y;
 
   Notify("ODOMETRY_DIST", m_total_distance);
+  cout << "odometry_dist calculated: " << m_total_distance << endl; //
 
   AppCastingMOOSApp::PostReport();
   return(true);
 }
+
 //---------------------------------------------------------
 // Procedure: OnStartUp()
-//            happens before connection is open
-
+// <-- ΔΙΟΡΘΩΘΗΚΕ: Καθαρίστηκε το περίεργο σχόλιο της γραμμής 119!
 bool Odometry::OnStartUp()
 {
   AppCastingMOOSApp::OnStartUp();
@@ -129,49 +134,34 @@ bool Odometry::OnStartUp()
 
     if(!handled)
       reportUnhandledConfigWarning(orig);
-
   }
   
-  registerVariables();	
+  registerVariables();  
   return(true);
 }
 
 //---------------------------------------------------------
 // Procedure: registerVariables()
-
 void Odometry::registerVariables()
 {
   AppCastingMOOSApp::RegisterVariables();
-  // Register("FOOBAR", 0);
-    Register ("NAV_X",0);
-    Register ("NAV_Y",0);
+  Register("NAV_X", 0);
+  Register("NAV_Y", 0);
 }
-
 
 //------------------------------------------------------------
 // Procedure: buildReport()
-
 bool Odometry::buildReport() 
 {
   m_msgs << "============================================" << endl;
   m_msgs << "pOdometry Mission Status                    " << endl;
   m_msgs << "============================================" << endl;
   
-  // Τυπώνουμε τη μεταβλητή μας με δύο δεκαδικά ψηφία
-m_msgs << "=============================================" << endl;
-  m_msgs << " USV Navigation Status                      " << endl;
-  m_msgs << "=============================================" << endl;
-  m_msgs << " Total Distance Traveled: " << m_total_distance << " meters." << endl;
-  m_msgs << "=============================================" << endl;
-  ACTable actab(4);
-  actab << "Alpha | Bravo | Charlie | Delta";
+  ACTable actab(3);
+  actab << "Current X | Current Y | Total Distance";
   actab.addHeaderLines();
-  actab << "one" << "two" << "three" << "four";
+  actab << m_current_x << m_current_y << m_total_distance;
   m_msgs << actab.getFormattedString();
 
   return(true);
 }
-
-
-
-

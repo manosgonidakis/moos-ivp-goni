@@ -1,8 +1,7 @@
 /************************************************************/
-/*    NAME: Jane Doe                                              */
-/*    ORGN: MIT, Cambridge MA                               */
-/*    FILE: Odometry.h                                          */
-/*    DATE: December 29th, 1963                             */
+/* NAME: Emmanouil                                       */
+/* ORGN: MIT, Cambridge MA                               */
+/* FILE: Odometry.h                                      */
 /************************************************************/
 
 #ifndef Odometry_HEADER
@@ -28,14 +27,14 @@ class Odometry : public AppCastingMOOSApp
  protected:
    void registerVariables();
 
- private: // Configuration variables
- bool   m_first_reading;
- double m_current_x;
- double m_current_y;
- double m_previous_x;
- double m_previous_y;
- double m_total_distance;
  private: // State variables
+   bool   m_first_reading; // <-- ΔΙΟΡΘΩΘΗΚΕ: Έφυγε το 'x' από εδώ!
+   double m_current_x;
+   double m_current_y;
+   double m_previous_x;
+   double m_previous_y;
+   double m_total_distance;
+   double m_last_nav_time; // Για το Staleness Check
 };
 
-#endif 
+#endif
