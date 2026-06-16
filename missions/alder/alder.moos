@@ -27,6 +27,8 @@ ProcessConfig = ANTLER
   Run = pOdometry	@ NewConsole = false
   Run = uSimMarineV22   @ NewConsole = false
   Run = pMarinePIDV22   @ NewConsole = false
+  Run = pLogger   	@ NewConsole = false
+
 }
 
 //------------------------------------------
@@ -167,3 +169,12 @@ ProcessConfig = pOdometry
   AppTick   = 4
   CommsTick = 4
 }
+
+ProcessConfig = pLogger
+ {
+   AppTick   = 8
+   CommsTick = 8
+
+   AsyncLog = true
+   WildCardLogging = true
+ }
