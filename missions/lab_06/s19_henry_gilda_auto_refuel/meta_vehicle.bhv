@@ -133,7 +133,7 @@ Behavior = BHV_StationKeep
   perpetual = true // let behaviour run even after completion
 }
 
-//---------------------------
+//-----------Timer----------------
 Behavior = BHV_Timer
 {
   name         = fuel_timer
