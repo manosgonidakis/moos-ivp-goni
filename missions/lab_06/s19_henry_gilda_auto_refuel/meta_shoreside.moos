@@ -2,14 +2,10 @@
 // ShoreSide Configuration File
 
 ServerHost = localhost
-ServerPort = 9000
-Community  = shoreside
+ServerPort = $(VPORT)
+Community  = $(VNAME)
 
-MOOSTimeWarp = 15
-LatOrigin  = 43.825300 
-LongOrigin = -70.330400 
-
-
+#include plug_origin_warp.moos
   
 //--------------------------------------------------------
 Processconfig = ANTLER
@@ -26,53 +22,9 @@ Processconfig = ANTLER
   Run = pRealm          @ NewConsole = false
 }
 
-//---------------------------------------------------------
-// pShare Config Block 
-
-ProcessConfig = pShare
-{
-  AppTick    = 2
-  CommsTick  = 2
-
-  input = route =  localhost:9200
-}
-
-
-//--------------------------------------------------
-// pHostInfo Block
-
-ProcessConfig = pHostInfo
-{
-  AppTick 	= 1
-  CommsTick 	= 1
-
-   default_hostip_force = localhost
-
-}
-
-
-//--------------------------------------------------
-// pLogger Configuration Block (Created from Plugin)
-
-ProcessConfig = pLogger
-{
-  AppTick 	= 10
-  CommsTick 	= 10
-  
-  File		= LOG_SHORESIDE
-  PATH		= ./
-  AsyncLog 	= true
-  FileTimeStamp = true
-
-  // Log it all!!!!!
-  LogAuxSrc       = true
-  WildCardLogging = true 
-
-  WildCardOmitPattern = *_STATUS
-
-  CompressAlogs = false
-}
-
+#include plug_pShare.moos
+#include plug_pHostInfo.moos
+#include plug_pLogger.moos
 
 //--------------------------------------------------
 // uFldShoreBroker Configuration Block
@@ -128,6 +80,4 @@ ProcessConfig = pMarineViewer
 
   button_three = STATION  # STATION_KEEP_ALL=true
 
-  button_four = REFUEL # REFUEL=true 
 }
-

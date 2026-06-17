@@ -1,10 +1,10 @@
 ServerHost = localhost
-ServerPort = 9002
+ServerPort = 9001
 
 // Community name IS the vehicle name
-Community  = henry
+Community  = gilda
 
-MOOSTimeWarp = 15
+MOOSTimeWarp = 20
 LatOrigin  = 43.825300 
 LongOrigin = -70.330400 
 
@@ -50,7 +50,7 @@ ProcessConfig = pLogger
   AppTick 	= 10
   CommsTick 	= 10
   
-  File		= LOG_HENRY
+  File		= LOG_GILDA
   PATH		= ./
   AsyncLog 	= true
   FileTimeStamp = true
@@ -118,7 +118,7 @@ ProcessConfig = pHelmIvP
 
   ok_skew      = any
   
-  Behaviors    = targ_henry.bhv  
+  Behaviors    = targ_gilda.bhv  
   Verbose      = false
   Domain       = course:0:359:360
   Domain       = speed:0:5:26
@@ -152,7 +152,7 @@ ProcessConfig = pShare
   AppTick    = 2
   CommsTick  = 2
 
-  input = route =  localhost:9202
+  input = route =  localhost:9201
 }
 
 

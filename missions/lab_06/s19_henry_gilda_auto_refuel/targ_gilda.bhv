@@ -8,6 +8,7 @@ initialize   LOITER  = true
 initialize   REFUEL = false
 initialize   WREFUEL = false
 
+
 set MODE = ACTIVE {
   DEPLOY = true
 } INACTIVE
@@ -15,6 +16,7 @@ set MODE = ACTIVE {
 set MODE = STATION-KEEPING {
   MODE = ACTIVE
   STATION_KEEP = true
+  REFUEL = false
 }                       
 
 set MODE = RETURNING {
@@ -40,7 +42,7 @@ set MODE = REFUELING {
     WREFUEL = true
 }
 
-//----------------------------------------------
+//----------------Loitering------------------------------
 Behavior = BHV_Loiter
 {
   name      = loiter
@@ -60,7 +62,7 @@ Behavior = BHV_Loiter
 }
 
 
-//----------------------------------------------
+//----------------Returning------------------------------
 Behavior = BHV_Waypoint
 {
   name      = waypt_return
@@ -72,11 +74,11 @@ Behavior = BHV_Waypoint
       speed = 1.3
      radius = 1.0
   nm_radius = 15.0
-     points = 0,0
+     points = 80,0
        lead = 8
 }
 
-//----------------------------------------------
+//----------------Station Keeping------------------------------
 Behavior = BHV_StationKeep
 {
   name      = station-keep
@@ -92,7 +94,7 @@ Behavior = BHV_StationKeep
       visual_hints = vertex_size=0, edge_color=gray50
 }
 
-//----------------------------------------------
+//-----------Returning To Refuel-----------------------------------
 Behavior = BHV_Waypoint
 {
   name      = waypt_refuel
@@ -104,11 +106,11 @@ Behavior = BHV_Waypoint
       speed = 1.3
      radius = 5.0
   nm_radius = 15.0
-     points = 0,0
+     points = 80,0
        lead = 8
 }
 
-//----------------------------------------------
+//----------------Refueling------------------------------
 Behavior = BHV_StationKeep
 {
   name      = refueling
@@ -116,7 +118,9 @@ Behavior = BHV_StationKeep
   condition = MODE==REFUELING
   endflag   = REFUEL = false
   endflag   = WREFUEL = false
-  duration_reset = REFUEL = true
+
+  duration_reset = REFUEL = false
+
    center_activate = true
       inner_radius = 5
       outer_radius = 10 
@@ -127,7 +131,23 @@ Behavior = BHV_StationKeep
 
   duration = 60
   perpetual = true // let behaviour run even after completion
-
-
 }
 
+//---------------------------
+Behavior = BHV_Timer
+{
+  name         = fuel_timer
+  pwt          = 100
+  
+  condition    = MODE == LOITERING
+
+  duration     = 300
+  duration_status = TIME_TO_REFUEL
+  
+  perpetual    = true
+
+  endflag      = REFUEL = true
+  
+  // Reset Timer if Refuel False
+  duration_reset = REFUEL = false
+}
