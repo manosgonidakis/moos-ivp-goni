@@ -8,7 +8,7 @@ Community  = $(VNAME)
 #include plug_origin_warp.moos
   
 //--------------------------------------------------------
-Processconfig = ANTLER
+ProcessConfig = ANTLER
 {
   MSBetweenLaunches = 100
 
@@ -19,7 +19,9 @@ Processconfig = ANTLER
   Run = pShare          @ NewConsole = false
   Run = pHostInfo       @ NewConsole = false
   Run = uFldShoreBroker @ NewConsole = false
-  Run = pRealm          @ NewConsole = false
+  Run = uTimerScript    @ NewConsole = false
+  Run = pPointAssign    @ NewConsole = false
+
 }
 
 #include plug_pShare.moos
@@ -34,7 +36,7 @@ ProcessConfig = uFldShoreBroker
   AppTick       = 1
   CommsTick     = 1
 
-  qbridge  = DEPLOY, NODE_REPORT
+  qbridge  = DEPLOY
   qbridge  = STATION_KEEP, APPCAST_REQ
   qbridge  = MOOS_MANUAL_OVERRIDE
 
@@ -42,6 +44,9 @@ ProcessConfig = uFldShoreBroker
   bridge   = src=RETURN_$V,  alias=RETURN
 
   bridge   = src=REFUEL, alias=REFUEL
+
+  bridge = src=VISIT_POINT_$V, alias=VISIT_POINT
+
 }
 
 //--------------------------------------------------------
@@ -82,3 +87,36 @@ ProcessConfig = pMarineViewer
 
 }
 
+ProcessConfig = uTimerScript 
+{
+  AppTick       = 4
+  CommsTick     = 4
+
+  paused    = true // scripted started paused
+  pause_var = POINTS_REQ  // POINTS_REQ=true will unfreeze
+  reset_max = 0 // sript will run once
+  reset_time = all-posted // will be completed when all events are sent
+
+  // set the area
+  randvar = varname=RAND_X, min=-25, max=200, key=at_post
+  randvar = varname=RAND_Y, min=-175, max=-25, key=at_post
+
+  //send firstpoint - VISIT_POINT = firstpoint
+  event = var=VISIT_POINT, val="firstpoint", time=2.0 // sec after deploy
+  
+  //burst of 100 poionts
+  //VISIT_POINT = x,y,id - 3 sec after deploy
+  event = var=VISIT_POINT, val="x=$[RAND_X], y=$[RAND_Y], id=$[COUNT]", amt=100, time=3.0
+  
+  // send lastpoint
+  event = var=VISIT_POINT, val="lastpoint", time=3.5 // sec after deploy - VISIT_POINT = lastpoint
+}
+//----------pPoint Assign-------------
+ProcessConfig = pPointAssign
+{
+  AppTick   = 4
+  CommsTick = 4
+  vname     = gilda
+  vname     = henry
+  assign_by_region = false
+}

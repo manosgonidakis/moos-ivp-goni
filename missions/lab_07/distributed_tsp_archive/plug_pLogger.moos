@@ -6,11 +6,12 @@ ProcessConfig = pLogger
   AppTick 	= 10
   CommsTick 	= 10
   
-  
   File		= LOG_%(VNAME)
   PATH		= ./
   AsyncLog 	= true
   FileTimeStamp = true
+
+  Log      = VISIT_POINT @ 0 NOSYNC
 
   // Log it all!!!!!
   LogAuxSrc       = true

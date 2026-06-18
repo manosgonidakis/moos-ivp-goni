@@ -1,0 +1,74 @@
+ServerHost = localhost
+ServerPort = $(VPORT)
+
+// Community name IS the vehicle name
+Community  = $(VNAME)
+
+#include plug_origin_warp.moos
+  
+//------------------------------------------------------------
+ServerHost = localhost
+ServerPort = $(VPORT)
+Community  = $(VNAME)
+
+#include plug_origin_warp.moos
+  
+//------------------------------------------------------------
+ProcessConfig = ANTLER
+{
+  MSBetweenLaunches = 50
+   
+  Run = MOOSDB          @ NewConsole = false
+  Run = pRealm          @ NewConsole = false
+  Run = uSimMarineV22   @ NewConsole = false
+  Run = pLogger         @ NewConsole = false
+  Run = pNodeReporter   @ NewConsole = false
+  Run = pMarinePIDV22   @ NewConsole = false
+  Run = pHelmIvP        @ NewConsole = false
+  Run = uProcessWatch   @ NewConsole = false
+  Run = pShare          @ NewConsole = false
+  Run = pHostInfo       @ NewConsole = false
+  Run = uFldNodeBroker  @ NewConsole = false
+  Run = pGenPath        @ NewConsole = false
+}
+ 
+#include plug_uSimMarineV22.moos
+#include plug_pLogger.moos
+#include plug_pNodeReporter.moos
+#include plug_pMarinePIDV22.moos
+#include plug_pHelmIvP.moos
+#include plug_uProcessWatch.moos
+#include plug_pShare.moos
+#include plug_pHostInfo.moos
+
+// 📌 ΣΒΗΣΤΗΚΕ ΤΟ #include plug_uFldNodeBroker.moos ΓΙΑ ΝΑ ΜΗΝ ΚΑΝΕΙ OVERWRITE!
+
+//--------------------------------------------------
+// 📌 Ο ΔΙΚΟΣ ΜΑΣ uFldNodeBroker (Γεφυρωμένος Σωστά)
+ProcessConfig = uFldNodeBroker
+{
+  AppTick   = 1
+  CommsTick = 1
+
+  try_shore_host = pshare_route=$(SHORE_IP):$(SHORE_PSHARE)
+
+  bridge = src=VIEW_POLYGON
+  bridge = src=VIEW_POINT
+  bridge = src=VIEW_SEGLIST
+  bridge = src=APPCAST
+  bridge = src=NODE_REPORT_LOCAL,  alias=NODE_REPORT
+  bridge = src=NODE_MESSAGE_LOCAL, alias=NODE_MESSAGE
+
+  bridge = src=VISIT_POINT
+  bridge = src=MODE
+  bridge = src=TRAVERSE_POINTS
+  bridge = src=GENPATH_POINTS
+}
+
+//--------------------------------------------------
+// pGenPath Configuration Block
+ProcessConfig = pGenPath
+{
+  AppTick   = 4
+  CommsTick = 4
+}
