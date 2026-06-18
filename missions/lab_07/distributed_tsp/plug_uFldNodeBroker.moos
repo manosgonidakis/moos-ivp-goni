@@ -15,4 +15,7 @@ ProcessConfig = uFldNodeBroker
   bridge = src=NODE_REPORT_LOCAL,  alias=NODE_REPORT
   bridge = src=NODE_MESSAGE_LOCAL, alias=NODE_MESSAGE
 
+ bridge = src=VEHICLE_READY, alias=VEHICLE_READY
+
+
 }

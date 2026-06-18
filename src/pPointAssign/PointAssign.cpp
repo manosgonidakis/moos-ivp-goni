@@ -57,10 +57,13 @@ bool PointAssign::OnNewMail(MOOSMSG_LIST &NewMail)
 
         // Σενάριο Α: Μοιρασιά ανά περιοχή (East-West)
         if(m_vnames.size() >= 2 && m_assign_by_region && x_found) {
-          if(x < 87.5) {
-            target_vehicle = m_vnames[0]; 
-          } else {
-            target_vehicle = m_vnames[1]; 
+          if(m_vnames.size() >= 2 && m_assign_by_region && x_found) {
+            if(x < 87.5) {
+              target_vehicle = m_vnames; // <--- ΣΩΣΤΟ
+
+              } else {
+              target_vehicle = m_vnames[1]; // <--- ΣΩΣΤΟ
+            }
           }
         }
         // Σενάριο Β: Εναλλάξ μοιρασιά (Alternating)

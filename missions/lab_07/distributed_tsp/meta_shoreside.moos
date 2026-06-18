@@ -47,6 +47,10 @@ ProcessConfig = uFldShoreBroker
 
   bridge = src=VISIT_POINT_$V, alias=VISIT_POINT
 
+  bridge = src=VISIT_POINT_HENRY, alias=VISIT_POINT
+  bridge = src=VISIT_POINT_GILDA, alias=VISIT_POINT
+
+
 }
 
 //--------------------------------------------------------
@@ -118,5 +122,5 @@ ProcessConfig = pPointAssign
   CommsTick = 4
   vname     = gilda
   vname     = henry
-  assign_by_region = false
+  assign_by_region = true
 }
