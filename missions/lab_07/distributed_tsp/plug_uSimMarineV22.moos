@@ -7,10 +7,10 @@ ProcessConfig = uSimMarineV22
   CommsTick = 10
 
   START_POS = $(START_POS), 180, 0
-  PREFIX    = NAV
-
-  //turn_rate = 100 // pio sfixtes strofes 
-  //turn_loss = 0
+  prefix        = NAV
+  turn_rate     = 95
+  thrust_map    = 0:0, 20:1, 40:2, 60:3, 80:4, 100:5
+	turn_spd_loss = 0.4
 
 }
 

@@ -58,9 +58,9 @@ Behavior = BHV_Waypoint
   radius      = 3.0   // Η άσκηση ζητάει προσέγγιση στα 3 μέτρα
   slip_radius = 15.0  // Για να μην γυρνάει πίσω αν χάσει κλειστή στροφή
 
-  lead        = 4
-  lead_damper = 3
-  capture_radius = 8
+  lead        = 3
+  lead_damper = 4
+  capture_radius = 4
       
   visual_hints = nextpt_color=yellow, nextpt_lcolor=aqua
   visual_hints = vertex_color=dodger_blue, edge_color=white

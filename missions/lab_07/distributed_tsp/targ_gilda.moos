@@ -39,10 +39,10 @@ ProcessConfig = uSimMarineV22
   CommsTick = 10
 
   START_POS = 80,0, 180, 0
-  PREFIX    = NAV
-
-  //turn_rate = 100 // pio sfixtes strofes 
-  //turn_loss = 0
+  prefix        = NAV
+  turn_rate     = 95
+  thrust_map    = 0:0, 20:1, 40:2, 60:3, 80:4, 100:5
+	turn_spd_loss = 0.4
 
 }
 
@@ -88,32 +88,33 @@ ProcessConfig = pNodeReporter
 
 ProcessConfig = pMarinePIDV22
 {
-  AppTick    = 10
-  CommsTick  = 10
-  
-  VERBOSE       = true
-  DEPTH_CONTROL = false
-  ACTIVE_START  = true
-  
+  AppTick    = 20
+  CommsTick  = 20
+
+  verbose       = true
+  depth_control = false
+
+  // SIM_INSTABILITY = 20
+
   // Yaw PID controller
-  YAW_PID_KP             = 2.5
-  YAW_PID_KD             = 0.15
-  YAW_PID_KI             = 0.0
-  YAW_PID_INTEGRAL_LIMIT = 0.07
-  
+  yaw_pid_kp		 = 2.0
+  yaw_pid_kd		 = 0.3
+  yaw_pid_ki		 = 0.3
+  yaw_pid_integral_limit = 0.07
+
   // Speed PID controller
-  SPEED_PID_KP           = 1.0
-  SPEED_PID_KD           = 0.0
-  SPEED_PID_KI           = 0.0
-  SPEED_PID_INTEGRAL_LIMIT = 0.07
-  
-  // Maximums
-  MAXRUDDER  = 100
-  MAXTHRUST  = 100
-  
+  speed_pid_kp		 = 1.0
+  speed_pid_kd		 = 0.0
+  speed_pid_ki		 = 0.0
+  speed_pid_integral_limit = 0.07
+
+  //MAXIMUMS
+  maxrudder    = 100
+  maxthrust    = 100
+
   // A non-zero SPEED_FACTOR overrides use of SPEED_PID
   // Will set DESIRED_THRUST = DESIRED_SPEED * SPEED_FACTOR
-  SPEED_FACTOR = 20
+  speed_factor = 20
 }
 
 //----------------------------------------------------
