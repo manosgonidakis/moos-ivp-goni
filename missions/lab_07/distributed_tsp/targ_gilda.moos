@@ -4,7 +4,7 @@ ServerPort = 9001
 // Community name IS the vehicle name
 Community  = gilda
 
-MOOSTimeWarp = 10
+MOOSTimeWarp = 30
 LatOrigin  = 43.825300 
 LongOrigin = -70.330400 
 
@@ -40,6 +40,10 @@ ProcessConfig = uSimMarineV22
 
   START_POS = 80,0, 180, 0
   PREFIX    = NAV
+
+  //turn_rate = 100 // pio sfixtes strofes 
+  //turn_loss = 0
+
 }
 
 
@@ -92,9 +96,9 @@ ProcessConfig = pMarinePIDV22
   ACTIVE_START  = true
   
   // Yaw PID controller
-  YAW_PID_KP             = 1.2
+  YAW_PID_KP             = 2.5
   YAW_PID_KD             = 0.15
-  YAW_PID_KI             = 0.6
+  YAW_PID_KI             = 0.0
   YAW_PID_INTEGRAL_LIMIT = 0.07
   
   // Speed PID controller

@@ -8,5 +8,9 @@ ProcessConfig = uSimMarineV22
 
   START_POS = $(START_POS), 180, 0
   PREFIX    = NAV
+
+  //turn_rate = 100 // pio sfixtes strofes 
+  //turn_loss = 0
+
 }
 
