@@ -5,7 +5,7 @@ ServerHost = localhost
 ServerPort = 9000
 Community  = shoreside
 
-MOOSTimeWarp = 12
+MOOSTimeWarp = 10
 LatOrigin  = 43.825300 
 LongOrigin = -70.330400 
 
@@ -98,8 +98,11 @@ ProcessConfig = uFldShoreBroker
 
   bridge = src=VISIT_POINT_$V, alias=VISIT_POINT
 
-  bridge = src=VISIT_POINT_HENRY, alias=VISIT_POINT
-  bridge = src=VISIT_POINT_GILDA, alias=VISIT_POINT
+  //bridge = src=VISIT_POINT_HENRY, alias=VISIT_POINT
+  //bridge = src=VISIT_POINT_GILDA, alias=VISIT_POINT
+
+  qbridge = VISIT_POINT
+
 
 
 }
@@ -139,6 +142,9 @@ ProcessConfig = pMarineViewer
   button_two   = STATION_KEEP_ALL=false
 
   button_three = STATION  # STATION_KEEP_ALL=true
+
+  button_four  = REGION_ON # ASSIGN_BY_REGION=true
+  button_five  = REGION_OFF # ASSIGN_BY_REGION=false
 
 }
 
