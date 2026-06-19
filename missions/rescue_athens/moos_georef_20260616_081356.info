@@ -1,0 +1,9 @@
+// pMarineViewer chart placement for moos_georef_20260616_081356.tif
+
+lat_north = 37.934550446
+lat_south = 37.931059607
+lon_east  = 23.628888138
+lon_west  = 23.623380022
+
+datum_lat = 37.9332599
+datum_lon = 23.6282166

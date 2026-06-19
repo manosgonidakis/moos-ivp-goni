@@ -12,6 +12,7 @@
 #include <map>
 #include <string>
 #include "XYPoint.h"
+#include <set>
 
 class GenRescue : public AppCastingMOOSApp
 {
@@ -33,11 +34,17 @@ class GenRescue : public AppCastingMOOSApp
 
  private: // Δικές μας μεταβλητές για την πλοήγηση
    
-   double m_nav_x; // Η τρέχουσα θέση X του σκάφους
-   double m_nav_y; // Η τρέχουσα θέση Y του σκάφους
+   double m_nav_x; 
+   double m_nav_y; 
 
    // Λίστα (Map) για την αποθήκευση των κολυμβητών: (ID -> XYPoint)
    std::map<std::string, XYPoint> m_swimmers;
+
+   // Set για την αποθήκευση των κολυμβητών που έχουν ήδη διασωθεί
+   std::set<std::string> m_rescued_swimmers; 
+
+   // ΝΕΟ: Η μεταβλητή (flag) που δείχνει αν χρειάζεται υπολογισμός νέας διαδρομής
+   bool m_path_update_needed;
 
  private: // State variables
 };

@@ -1,0 +1,45 @@
+
+1) OpRegions are created with geoview (moos-ivp)
+
+  $ geoview moos_georef_20260616_081356.tif
+
+Four swimmer-generation regions were created inside the survey_athens op-region:
+
+OPA1="-138.0,-13.4:-89.3,-42.8:-68.3,-10.6:-90.4,-11.3"
+OPA2="-161.7,-9.9:-85.2,-56.1:-52.2,-5.5:-86.9,-6.6"
+OPA3="-185.4,-6.4:-81.1,-69.4:-36.1,-0.4:-83.4,-1.9"
+OPA4="-215.0,-2.0:-76.0,-86.0:-16.0,6.0:-79.0,4.0"
+
+
+2) Swim files are created with gen_swimmers (moos-ivp-2680)
+
+  $ gen_swimmers --poly="-138.0,-13.4:-89.3,-42.8:-68.3,-10.6:-90.4,-11.3"
+                 --sep=5 > athens_01.txt
+
+  In fact, the build_swim_files.sh script builds a random laydown
+  for five files:
+
+  athens_01.txt  (region 1, smallest)
+  athens_02.txt  (region 2)
+  athens_03.txt  (region 3)
+  athens_04.txt  (region 4, largest)
+
+3) The swim files can be viewed with swimview (moos-ivp-2680)
+
+  $ cd rescue_athens
+  $ swimview athens_*.txt
+
+  Use the ']' and '[' keys to cycle through the swim files.
+
+4) To launch the mission
+
+  $ ./launch.sh 5 -r1
+
+  This will launch the mission warp 5, single vehicle rescue
+  mission (r1), and swimfile athens_rand.txt by default.
+
+  $ ./launch.sh 5 -r2 --rand
+
+
+Note: When making a random swim_file at launch time, the file
+is created into athens_rand.txt and then loaded..

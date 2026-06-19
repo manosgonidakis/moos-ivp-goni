@@ -1,0 +1,24 @@
+
+poly = label=a1, pts={-138.0,-13.4:-89.3,-42.8:-68.3,-10.6:-90.4,-11.3}
+poly = label=a2, pts={-161.7,-9.9:-85.2,-56.1:-52.2,-5.5:-86.9,-6.6}
+poly = label=a3, pts={-185.4,-6.4:-81.1,-69.4:-36.1,-0.4:-83.4,-1.9}
+poly = label=a4, pts={-215.0,-2.0:-76.0,-86.0:-16.0,6.0:-79.0,4.0}
+
+
+//poly = label=a1, pts={28.4,12.7:36.3,23.4:11.8,37.8:3.6,26.8}
+//poly = label=a2, pts={28.4,12.7:38.4,29.4:27.6,48.2:-0.4,54:-10.8,34.6}
+//poly = label=a3, pts={28.4,14.7:38.4,31.4:39,54:21.2,65.8:-4.9,69.4:-25,45.7}
+//poly = label=a4, pts={28.4,14.7:38.4,31.4:42.8,59.5:29,87.1:-9,89.5:-34.9,50.8}
+
+Where do these areas reside
+
+Apps:
+
+1. In moos-ivp/ivp/src/app_geoview (not committed)
+   In areas.txt
+2. In moos-ivp-2680/src/gen_swimmers
+   In main.cpp, switches for -a1,-a2,-a3,-a4
+
+Mission
+3. In moos-ivp-greece/missions/rescue_athens
+   In build_swim_files.sh as -ag1,-agx switches
