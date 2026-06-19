@@ -4,6 +4,9 @@
 #include "XYSegList.h" 
 #include "GenPath.h"
 
+// Βάλε αυτό ψηλά στο GenPath.cpp
+static int ready_counter = 0; 
+
 using namespace std;
 
 GenPath::GenPath()
@@ -54,6 +57,11 @@ bool GenPath::Iterate()
 {
   AppCastingMOOSApp::Iterate();
 
+  // 📌 Στέλνουμε το VEHICLE_READY μερικές φορές για να πιάσει σίγουρα η γέφυρα!
+  if(m_point_queue.empty() && !m_got_last_point && ready_counter < 10) {
+      Notify("VEHICLE_READY", m_host_community);
+      ready_counter++;
+  }
   if(m_got_last_point && !m_point_queue.empty()) {
     
     XYSegList my_path; 
@@ -140,6 +148,9 @@ bool GenPath::Iterate()
 bool GenPath::OnConnectToServer()
 {
   RegisterVariables();
+  // Ενημερώνουμε το Shoreside (το pPointAssign) ότι το όχημα είναι έτοιμο!
+  // Το m_host_community θα στείλει αυτόματα "henry" στο ένα όχημα και "gilda" στο άλλο.
+  Notify("VEHICLE_READY", m_host_community);
   return(true);
 }
 
@@ -160,10 +171,28 @@ void GenPath::RegisterVariables()
 
 bool GenPath::buildReport() 
 {
+ m_msgs << "============================================" << endl;
+  m_msgs << "pGenPath " << m_host_community << " Status:" << endl;
   m_msgs << "============================================" << endl;
-  m_msgs << "GenPath Status:                             " << endl;
-  m_msgs << "============================================" << endl;
-  m_msgs << "Points in queue: " << m_point_queue.size() << endl;
-  m_msgs << "Got last point:  " << (m_got_last_point ? "Yes" : "No") << endl;
+  
+  m_msgs << "Visit Radius:            3" << endl;
+  
+  // Ένα ωραίο τρικ για να φαίνεται πόσα σημεία λάβαμε συνολικά 
+  // (αν τα έχει βάλει στο my_path και τα έστειλε, η ουρά αδειάζει, 
+  // οπότε μπορούμε να τυπώσουμε ένα generic μήνυμα αν έχει γίνει το path)
+  m_msgs << "Points currently in queue: " << m_point_queue.size() << endl;
+  m_msgs << "First Point Received:    " << (m_got_last_point ? "true" : "false/pending") << endl;
+  m_msgs << "Last Point Received:     " << (m_got_last_point ? "true" : "false/pending") << endl;
+  
+  // Έλεγχος αν έχουμε λάβει στίγμα (αφού αρχικοποιούνται στο 0)
+  bool nav_ok = (m_nav_x != 0 || m_nav_y != 0);
+  m_msgs << "NAV_X/Y Received:        " << (nav_ok ? "true" : "false") << endl;
+  
+  m_msgs << endl;
+  m_msgs << "Tour Status              " << endl;
+  m_msgs << "------------------------ " << endl;
+  m_msgs << "Points Visited:          (Handled by Helm/Next Lab)" << endl;
+  m_msgs << "Points Unvisited:        (Handled by Helm/Next Lab)" << endl;
+
   return(true);
 }

@@ -4,6 +4,7 @@
 #include "XYPoint.h"
 #include "PointAssign.h"
 
+
 using namespace std;
 
 PointAssign::PointAssign()
@@ -20,17 +21,26 @@ bool PointAssign::OnNewMail(MOOSMSG_LIST &NewMail)
 {
   AppCastingMOOSApp::OnNewMail(NewMail);
 
-  if(m_vnames.empty()) return(true);
+ if(m_vnames.empty()) return(true);
 
   MOOSMSG_LIST::iterator p;
   for(p=NewMail.begin(); p!=NewMail.end(); p++) {
     CMOOSMsg &msg = *p;
     string key = msg.GetKey();
+    
+    // 📌 ΔΙΟΡΘΩΣΗ: Μεταφέρουμε το sval εδώ πάνω για να το βλέπουν όλα τα if!
+    string sval = msg.GetString(); 
 
-    if(key == "VISIT_POINT") {
-      string sval = msg.GetString(); 
+    // Έλεγχος για το κουμπί αλλαγής Region
+    if (key == "ASSIGN_BY_REGION") {
+        m_assign_by_region = (tolower(sval) == "true");
+    }
 
-      // 1️⃣ ΠΕΡΙΠΤΩΣΗ: Πρώτο ή Τελευταίο σημείο
+    // 1️⃣ ΠΕΡΙΠΤΩΣΗ: Σημεία από το uTimerScript
+    else if(key == "VISIT_POINT") {
+      // (Σημείωση: Αφαιρέθηκε η δήλωση του sval από εδώ, αφού την κάναμε παραπάνω)
+
+      // Πρώτο ή Τελευταίο σημείο
       if(sval == "firstpoint" || sval == "lastpoint") {
         for(size_t i = 0; i < m_vnames.size(); i++) {
           Notify("VISIT_POINT_" + toupper(m_vnames[i]), sval);
@@ -57,12 +67,11 @@ bool PointAssign::OnNewMail(MOOSMSG_LIST &NewMail)
 
         // Σενάριο Α: Μοιρασιά ανά περιοχή (East-West)
         if(m_vnames.size() >= 2 && m_assign_by_region && x_found) {
-          if(m_vnames.size() >= 2 && m_assign_by_region && x_found) {
+          if(m_vnames.size() >= 2 && m_assign_by_region && x_found) { // (Αυτό το διπλό if υπάρχει στον κώδικά σου, αλλά ας το αφήσουμε για να μην αλλάξουν οι γραμμές)
             if(x < 87.5) {
-              target_vehicle = m_vnames; // <--- ΣΩΣΤΟ
-
-              } else {
-              target_vehicle = m_vnames[1]; // <--- ΣΩΣΤΟ
+              target_vehicle = m_vnames[0]; // 📌 ΔΙΟΡΘΩΘΗΚΕ: Πρόσθεσε το [0] για το πρώτο σκάφος
+            } else {
+              target_vehicle = m_vnames[1]; 
             }
           }
         }
@@ -74,7 +83,7 @@ bool PointAssign::OnNewMail(MOOSMSG_LIST &NewMail)
         }
 
         // Αποστολή και Οπτικοποίηση
-        if(!target_vehicle.empty()) {
+        if(!target_vehicle.empty()) {          
           Notify("VISIT_POINT_" + toupper(target_vehicle), sval);
 
           // --- Native C++ Parsing για τα Y και ID (για το plot) ---
@@ -99,15 +108,31 @@ bool PointAssign::OnNewMail(MOOSMSG_LIST &NewMail)
           if(x_found && !s_y.empty() && !s_id.empty()) {
             double y = stod(s_y);
             
+           
             string vname_low = tolower(target_vehicle);
             string color = "yellow"; 
-            if(vname_low == "gilda")      color = "red";
-            else if(vname_low == "henry") color = "magenta"; 
+            if(vname_low == "gilda")      color = "yellow";
+            else if(vname_low == "henry") color = "red"; 
 
             postViewPoint(x, y, s_id, color);
           }
         }
-      } 
+      } // <--- ΤΕΛΟΣ του else (Κανονικό Σημείο)
+    } //ΕΔΩ ΠΡΕΠΕΙ ΝΑ ΚΛΕΙΝΕΙ ΤΟ if(key == "VISIT_POINT") !!!
+    
+    // 3️⃣ ΠΕΡΙΠΤΩΣΗ: Το μήνυμα είναι VEHICLE_READY
+    else if(key == "VEHICLE_READY") {
+      string vname_ready = msg.GetString(); // Εδώ παίρνουμε το όνομα του οχήματος
+      
+      // Αν δεν το έχουμε ήδη καταγράψει, το προσθέτουμε στη λίστα
+      if(find(m_ready_vehicles.begin(), m_ready_vehicles.end(), vname_ready) == m_ready_vehicles.end()) {
+          m_ready_vehicles.push_back(vname_ready);
+      }
+
+      // Αν δήλωσαν έτοιμα ΟΛΑ τα σκάφη που περιμένουμε (m_vnames)
+      if(m_ready_vehicles.size() == m_vnames.size()) {
+          Notify("POINTS_REQ", "false"); // ΤΩΡΑ ξεπαγώνουμε το uTimerScript!
+      }
     } 
   } 
   
@@ -125,8 +150,7 @@ bool PointAssign::OnConnectToServer()
    RegisterVariables();
    
    //Στέλνουμε σήμα στο uTimerScript ότι είμαστε έτοιμοι!
-   Notify("POINTS_REQ", "false"); // Στο uTimerScript, το false ξεπαγώνει τη pause_var
-   return(true);
+     return(true);
 }
 
 bool PointAssign::OnStartUp()
@@ -163,6 +187,7 @@ void PointAssign::RegisterVariables()
   AppCastingMOOSApp::RegisterVariables();
   Register("VISIT_POINT", 0);
   Register("VEHICLE_READY", 0); // 📌 Θα το στέλνει το σκάφος όταν ανοίγει!
+  Register("ASSIGN_BY_REGION", 0);
 }
 
 void PointAssign::postViewPoint(double x, double y, string label, string color)
