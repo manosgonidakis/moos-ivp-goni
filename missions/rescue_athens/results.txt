@@ -10,3 +10,6 @@ score1=0  score2=0  dur=950.3  team1=abe  team2=unknown  winner=abe  mtype=rescu
       score1=0, score2=0, dur=950.3, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[GORY-KIEV], mhash_lshort=V-GORY-KIEV, mhash=mhash=260619-1620V-GORY-KIEV,utc=1781875227.49
                                 score1=15, score2=0, dur=270.7, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[JUST-ZACK], mhash_lshort=K-JUST-ZACK, mhash=mhash=260619-1710K-JUST-ZACK,utc=1781878244.32
   score1=15, score2=0, dur=248.6, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[NINE-SODA], mhash_lshort=J-NINE-SODA, mhash=mhash=260619-1712J-NINE-SODA,utc=1781878355.38
+  score1=15, score2=0, dur=252.4, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[SOFT-CARD], mhash_lshort=C-SOFT-CARD, mhash=mhash=260619-1718C-SOFT-CARD,utc=1781878710.62
+  score1=15, score2=0, dur=274.5, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[KIND-UTAH], mhash_lshort=I-KIND-UTAH, mhash=mhash=260619-1725I-KIND-UTAH,utc=1781879126.83
+  score1=15, score2=0, dur=272.5, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[DRAB-BOLT], mhash_lshort=X-DRAB-BOLT, mhash=mhash=260621-1400X-DRAB-BOLT,utc=1782039625.48
