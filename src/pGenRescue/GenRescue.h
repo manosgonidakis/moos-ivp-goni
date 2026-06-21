@@ -36,14 +36,14 @@ class GenRescue : public AppCastingMOOSApp
    
    double m_nav_x; 
    double m_nav_y; 
+   double m_enemy_x;
+   double m_enemy_y;
 
    // Λίστα (Map) για την αποθήκευση των κολυμβητών: (ID -> XYPoint)
+   bool m_first_run_done; 
+
    std::map<std::string, XYPoint> m_swimmers;
-
-   // Set για την αποθήκευση των κολυμβητών που έχουν ήδη διασωθεί
    std::set<std::string> m_rescued_swimmers; 
-
-   // ΝΕΟ: Η μεταβλητή (flag) που δείχνει αν χρειάζεται υπολογισμός νέας διαδρομής
    bool m_path_update_needed;
 
  private: // State variables
