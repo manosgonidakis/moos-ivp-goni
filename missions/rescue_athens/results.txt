@@ -55,3 +55,11 @@ score1=0  score2=0  dur=950.3  team1=abe  team2=unknown  winner=abe  mtype=rescu
   score1=3, score2=0, dur=950.3, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[POOR-SHAG], mhash_lshort=X-POOR-SHAG, mhash=mhash=260622-1255X-POOR-SHAG,utc=1782122159.09
     score1=15, score2=0, dur=460.3, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[MEGA-SALE], mhash_lshort=K-MEGA-SALE, mhash=mhash=260622-1301K-MEGA-SALE,utc=1782122519.88
   score1=15, score2=0, dur=457.8, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[CAGY-WEBS], mhash_lshort=Q-CAGY-WEBS, mhash=mhash=260622-1303Q-CAGY-WEBS,utc=1782122614.33
+  score1=15, score2=0, dur=455.7, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[GAMY-IAGO], mhash_lshort=Z-GAMY-IAGO, mhash=mhash=260622-1305Z-GAMY-IAGO,utc=1782122732.60
+  score1=15, score2=0, dur=522.2, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[NEDS-HALF], mhash_lshort=J-NEDS-HALF, mhash=mhash=260622-1352J-NEDS-HALF,utc=1782125567.25
+  score1=15, score2=0, dur=535.7, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[ZANY-ORKS], mhash_lshort=D-ZANY-ORKS, mhash=mhash=260622-1353D-ZANY-ORKS,utc=1782125593.52
+  score1=17, score2=0, dur=633.1, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[COOL-LINE], mhash_lshort=K-COOL-LINE, mhash=mhash=260622-1357K-COOL-LINE,utc=1782125828.21
+  score1=20, score2=0, dur=581.1, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[CALM-JOSH], mhash_lshort=L-CALM-JOSH, mhash=mhash=260622-1358L-CALM-JOSH,utc=1782125888.44
+  score1=15, score2=0, dur=503.8, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[TEDS-DUET], mhash_lshort=L-TEDS-DUET, mhash=mhash=260622-1534L-TEDS-DUET,utc=1782131648.37
+  score1=15, score2=0, dur=519.3, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[NUMB-FIGS], mhash_lshort=Z-NUMB-FIGS, mhash=mhash=260622-1534Z-NUMB-FIGS,utc=1782131698.01
+  score1=15, score2=0, dur=521.8, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[MALE-DAVY], mhash_lshort=B-MALE-DAVY, mhash=mhash=260622-1535B-MALE-DAVY,utc=1782131745.26

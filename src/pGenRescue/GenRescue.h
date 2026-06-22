@@ -10,9 +10,10 @@
 
 #include "MOOS/libMOOS/Thirdparty/AppCasting/AppCastingMOOSApp.h"
 #include <map>
-#include <string>
-#include "XYPoint.h"
 #include <set>
+#include <string>
+#include <vector>
+#include "XYPoint.h"
 
 class GenRescue : public AppCastingMOOSApp
 {
@@ -46,6 +47,7 @@ class GenRescue : public AppCastingMOOSApp
 
    std::map<std::string, XYPoint> m_swimmers;
    std::set<std::string> m_rescued_swimmers;
+   std::vector<XYPoint> m_obstacles;
    bool m_path_update_needed;
 
  private: // State variables

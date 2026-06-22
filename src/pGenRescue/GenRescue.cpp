@@ -142,7 +142,7 @@ bool GenRescue::Iterate()
     
     double dist = hypot(point.x() - m_nav_x, point.y() - m_nav_y);
 
-    if(dist <= 5.0) { // [cite: 186]
+    if(dist <= 6.5) {
       string request = "vname=" + m_host_community + ",name=" + id;
       Notify("RESCUE_REQUEST", request); // [cite: 185]
     }
@@ -204,8 +204,12 @@ bool GenRescue::Iterate()
           double dist = hypot(px - current_x, py - current_y);
           double dist_to_enemy = hypot(px - m_enemy_x, py - m_enemy_y);
 
+          // Soft Penalty (Επιλογή Α): αντί για hard skip, υποβάθμισε τον contested
+          // swimmer αλλά ΜΗΝ τον εγκαταλείπεις. Αν ο αντίπαλος είναι κολλημένος/νεκρός,
+          // θα τον σαρώσουμε εμείς αφού τελειώσουμε τους εύκολους (graceful degradation).
+          double ttt_penalty = 0.0;
           if (enemy_known && dist_to_enemy < dist && remaining_swimmers.size() > 1) {
-              continue;
+              ttt_penalty = 300.0;
           }
 
           // Count neighbors within cluster_radius
@@ -226,7 +230,23 @@ bool GenRescue::Iterate()
           double speed         = (m_nav_speed < 0.2) ? 1.0 : m_nav_speed;
           double time_turn     = (heading_error / 30.0) * (1.0 + speed * (heading_error / 180.0));
           double time_straight = dist / speed;
-          double ttt           = time_turn + time_straight;
+          double ttt           = time_turn + time_straight + ttt_penalty;
+
+          // Virtual Obstacle Filter: penalize paths that pass within 12m of any buoy
+          for(unsigned int oi = 0; oi < m_obstacles.size(); oi++) {
+            double ax = current_x, ay = current_y;
+            double abx = px - ax,  aby = py - ay;
+            double ab2 = abx*abx + aby*aby;
+            double t = 0.0;
+            if(ab2 > 1e-9) {
+              t = ((m_obstacles[oi].x()-ax)*abx + (m_obstacles[oi].y()-ay)*aby) / ab2;
+              if(t < 0.0) t = 0.0;
+              if(t > 1.0) t = 1.0;
+            }
+            double cx = ax + t*abx, cy = ay + t*aby;
+            if(hypot(m_obstacles[oi].x()-cx, m_obstacles[oi].y()-cy) < 12.0)
+              ttt += 500.0;
+          }
 
           double score = ((neighbors + 1) * (neighbors + 1)) / (ttt + 1e-6);
 
@@ -291,6 +311,38 @@ bool GenRescue::Iterate()
 bool GenRescue::OnStartUp()
 {
   AppCastingMOOSApp::OnStartUp();
+
+  STRING_LIST sParams;
+  m_MissionReader.EnableVerbatimQuoting(false);
+  if(m_MissionReader.GetConfiguration(GetAppName(), sParams)) {
+    STRING_LIST::iterator p;
+    for(p = sParams.begin(); p != sParams.end(); p++) {
+      string line  = *p;
+      string param = tolower(biteStringX(line, '='));
+      string value = line;
+      if(param == "obstacle") {
+        double ox = 0, oy = 0;
+        vector<string> parts = parseString(value, ',');
+        for(unsigned int i = 0; i < parts.size(); i++) {
+          string kv = parts[i];
+          string k  = biteStringX(kv, '=');
+          k = stripBlankEnds(k);
+          kv = stripBlankEnds(kv);
+          if(k == "x") ox = atof(kv.c_str());
+          else if(k == "y") oy = atof(kv.c_str());
+        }
+        m_obstacles.push_back(XYPoint(ox, oy));
+      }
+    }
+  }
+
+  // Fallback: known buoy centers if none parsed from config
+  if(m_obstacles.empty()) {
+    m_obstacles.push_back(XYPoint(-35.0,  -6.0));
+    m_obstacles.push_back(XYPoint(-62.5, -17.9));
+    m_obstacles.push_back(XYPoint(-95.0, -28.0));
+  }
+
   RegisterVariables();
   return(true);
 }

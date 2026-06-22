@@ -90,6 +90,12 @@ ProcessConfig = pGenRescue
   AppTick   = 4
   CommsTick = 4
 
+  // Live obstacle coords (source-of-truth για το Virtual Obstacle Filter).
+  // Αν αλλάξει το πεδίο, άλλαξε ΕΔΩ — όχι recompile. Ο C++ κρατά hardcoded fallback.
+  obstacle = x=-35,y=-6
+  obstacle = x=-62.5,y=-17.9
+  obstacle = x=-95,y=-28
+
 #ifdef VNAME abe
 	// foo = true
 #elseifdef VNAME ben
