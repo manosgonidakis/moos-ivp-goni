@@ -34,8 +34,10 @@ class GenRescue : public AppCastingMOOSApp
 
  private: // Δικές μας μεταβλητές για την πλοήγηση
    
-   double m_nav_x; 
-   double m_nav_y; 
+   double m_nav_x;
+   double m_nav_y;
+   double m_nav_heading;
+   double m_nav_speed;
    double m_enemy_x;
    double m_enemy_y;
 

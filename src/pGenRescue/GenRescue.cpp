@@ -11,7 +11,9 @@ GenRescue::GenRescue()
 {
   m_nav_x = 0;
   m_nav_y = 0;
-  m_enemy_x = 0; // Αρχικοποίηση θέσης αντιπάλου
+  m_nav_heading = 0;
+  m_nav_speed = 0;
+  m_enemy_x = 0;
   m_enemy_y = 0;
   m_path_update_needed = false;
   m_first_run_done = false;
@@ -43,6 +45,12 @@ bool GenRescue::OnNewMail(MOOSMSG_LIST &NewMail)
     }
     else if(key == "NAV_Y") {
       m_nav_y = msg.GetDouble();
+    }
+    else if(key == "NAV_HEADING") {
+      m_nav_heading = msg.GetDouble();
+    }
+    else if(key == "NAV_SPEED") {
+      m_nav_speed = msg.GetDouble();
     }
     
     // 📌 ΝΕΟ: Ενημέρωση της θέσης του αντιπάλου (είτε παίζεις με το 'ben' είπε με το 'abe')
@@ -179,8 +187,17 @@ bool GenRescue::Iterate()
             if(d <= cluster_radius) neighbors++;
           }
 
-          // Higher score = denser cluster relative to distance
-          double score = (neighbors + 1) / (dist + 1e-6);
+          // Time-to-Target (TTT): turning time + straight travel time
+          double bearing = atan2(px - current_x, py - current_y) * 180.0 / M_PI;
+          if(bearing < 0) bearing += 360.0;
+          double heading_error = fabs(m_nav_heading - bearing);
+          if(heading_error > 180.0) heading_error = 360.0 - heading_error;
+          double speed = (m_nav_speed < 0.2) ? 1.0 : m_nav_speed;
+          double time_turn     = heading_error / 30.0;
+          double time_straight = dist / speed;
+          double ttt           = time_turn + time_straight;
+
+          double score = (neighbors + 1) / (ttt + 1e-6);
 
           if(score > best_score) {
             best_score = score;
@@ -250,6 +267,8 @@ void GenRescue::RegisterVariables()
   
   Register("NAV_X", 0);
   Register("NAV_Y", 0);
+  Register("NAV_HEADING", 0);
+  Register("NAV_SPEED", 0);
   Register("SWIMMER_ALERT", 0); // [cite: 184, 333]
   Register("FOUND_SWIMMER", 0); // [cite: 349]
 
