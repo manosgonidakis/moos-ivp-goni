@@ -13,3 +13,4 @@ score1=0  score2=0  dur=950.3  team1=abe  team2=unknown  winner=abe  mtype=rescu
   score1=15, score2=0, dur=252.4, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[SOFT-CARD], mhash_lshort=C-SOFT-CARD, mhash=mhash=260619-1718C-SOFT-CARD,utc=1781878710.62
   score1=15, score2=0, dur=274.5, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[KIND-UTAH], mhash_lshort=I-KIND-UTAH, mhash=mhash=260619-1725I-KIND-UTAH,utc=1781879126.83
   score1=15, score2=0, dur=272.5, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[DRAB-BOLT], mhash_lshort=X-DRAB-BOLT, mhash=mhash=260621-1400X-DRAB-BOLT,utc=1782039625.48
+  score1=15, score2=0, dur=271.9, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[VERY-TUCK], mhash_lshort=K-VERY-TUCK, mhash=mhash=260622-0832K-VERY-TUCK,utc=1782106350.15
