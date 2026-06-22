@@ -213,18 +213,18 @@ Behavior = BHV_Waypoint
   name       = waypt_rescue
   pwt        = 100
   
-  // 📌 ΔΙΟΡΘΩΘΗΚΕ: Μπαίνει σε λειτουργία όταν είμαστε σε SURVEYING mode
+  //Μπαίνει σε λειτουργία όταν είμαστε σε SURVEYING mode
   condition  = MODE==SURVEYING
   condition  = RETURN=false
   
   updates    = RESCUE_UPDATES
   perpetual  = true
 
-  // 📌 ΔΙΟΡΘΩΘΗΚΕ: Χρησιμοποιούμε points (πληθυντικό) και ΟΧΙ point=0,0
+  //Χρησιμοποιούμε points (πληθυντικό) και ΟΧΙ point=0,0
   // ώστε το Helm να ξέρει εξαρχής ότι περιμένει λίστα διαδρομής (Segment List)
   points         = 0,0
 
-  speed          = 2.0 
+  speed          = 2.2 
   capture_radius = 4.0
   slip_radius    = 15.0
 
