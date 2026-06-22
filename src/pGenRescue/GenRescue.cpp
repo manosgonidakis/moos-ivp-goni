@@ -291,7 +291,7 @@ bool GenRescue::Iterate()
 bool GenRescue::OnStartUp()
 {
   AppCastingMOOSApp::OnStartUp();
-  RegisterVariables();  
+  RegisterVariables();
   return(true);
 }
 
