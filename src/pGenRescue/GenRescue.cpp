@@ -167,6 +167,34 @@ bool GenRescue::Iterate()
         double best_score = -1;
         double best_x = 0, best_y = 0;
 
+        // Proximity Override: αν υπάρχει swimmer <=12m, παρέκαμψε το scoring
+        double urgent_dist = -1;
+        double r_urgent = 12.0;
+        for(auto const& sp : remaining_swimmers) {
+          double px = sp.second.x();
+          double py = sp.second.y();
+          double d  = hypot(px - current_x, py - current_y);
+          if(d > r_urgent) continue;
+          double d_enemy = hypot(px - m_enemy_x, py - m_enemy_y);
+          if(enemy_known && d_enemy < d && remaining_swimmers.size() > 1) continue;
+          if(urgent_dist < 0 || d < urgent_dist) {
+            urgent_dist = d;
+            best_id = sp.first;
+            best_x  = px;
+            best_y  = py;
+          }
+        }
+        if(best_id != "") {
+          double next_bearing = atan2(best_x - current_x, best_y - current_y) * 180.0 / M_PI;
+          if(next_bearing < 0) next_bearing += 360.0;
+          current_heading = next_bearing;
+          my_path.add_vertex(best_x, best_y);
+          current_x = best_x;
+          current_y = best_y;
+          remaining_swimmers.erase(best_id);
+          continue;
+        }
+
         for(auto const& swimmer_pair : remaining_swimmers) {
           std::string id = swimmer_pair.first;
           XYPoint point = swimmer_pair.second;

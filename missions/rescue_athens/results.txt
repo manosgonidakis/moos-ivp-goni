@@ -16,3 +16,11 @@ score1=0  score2=0  dur=950.3  team1=abe  team2=unknown  winner=abe  mtype=rescu
   score1=15, score2=0, dur=271.9, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[VERY-TUCK], mhash_lshort=K-VERY-TUCK, mhash=mhash=260622-0832K-VERY-TUCK,utc=1782106350.15
   score1=15, score2=0, dur=269.8, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[VILE-ALEC], mhash_lshort=U-VILE-ALEC, mhash=mhash=260622-0845U-VILE-ALEC,utc=1782107147.59
   score1=15, score2=0, dur=297.3, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[SAFE-LORD], mhash_lshort=A-SAFE-LORD, mhash=mhash=260622-0848A-SAFE-LORD,utc=1782107288.40
+  score1=15, score2=0, dur=335.9, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[EASY-AVEN], mhash_lshort=J-EASY-AVEN, mhash=mhash=260622-0856J-EASY-AVEN,utc=1782107775.74
+    score1=15, score2=0, dur=321.9, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[WAXY-GAEL], mhash_lshort=R-WAXY-GAEL, mhash=mhash=260622-0858R-WAXY-GAEL,utc=1782107897.02
+  score1=15, score2=0, dur=321.4, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[NEAT-WIND], mhash_lshort=W-NEAT-WIND, mhash=mhash=260622-0858W-NEAT-WIND,utc=1782107935.81
+  score1=15, score2=0, dur=322.7, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[ONLY-HOUR], mhash_lshort=W-ONLY-HOUR, mhash=mhash=260622-0859W-ONLY-HOUR,utc=1782107968.67
+  score1=15, score2=0, dur=320, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[HALS-NORM], mhash_lshort=M-HALS-NORM, mhash=mhash=260622-0900M-HALS-NORM,utc=1782108018.45
+  score1=15, score2=0, dur=320.8, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[COZY-JOHN], mhash_lshort=U-COZY-JOHN, mhash=mhash=260622-0910U-COZY-JOHN,utc=1782108601.47
+  score1=15, score2=0, dur=333.7, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[HALS-ANTS], mhash_lshort=L-HALS-ANTS, mhash=mhash=260622-0915L-HALS-ANTS,utc=1782108950.78
+  
