@@ -52,7 +52,7 @@ Behavior = BHV_StationKeep
 Behavior = BHV_AvoidObstacleV24
 {
   name       = avdob_buoy_1
-  pwt        = 3000
+  pwt        = 350
   condition  = AVOID = true
   condition  = MODE==ACTIVE
   condition  = MODE!=ACTIVE:STATION-KEEPING
@@ -61,8 +61,8 @@ Behavior = BHV_AvoidObstacleV24
   polygon    = pts={-31,-6:-32.17,-3.17:-35,-2:-37.83,-3.17:-39,-6:-37.83,-8.83:-35,-10:-32.17,-8.83}, label=buoy_1
 
   allowable_ttc     = 20
-  pwt_outer_dist    = 13
-  pwt_inner_dist    = 5.0
+  pwt_outer_dist    = 14
+  pwt_inner_dist    = 6.0
   completed_dist    = 500
   min_util_cpa_dist = 4
   max_util_cpa_dist = 8
@@ -73,7 +73,7 @@ Behavior = BHV_AvoidObstacleV24
 Behavior = BHV_AvoidObstacleV24
 {
   name       = avdob_buoy_2
-  pwt        = 3000
+  pwt        = 350
   condition  = AVOID = true
   condition  = MODE==ACTIVE
   condition  = MODE!=ACTIVE:STATION-KEEPING
@@ -81,9 +81,9 @@ Behavior = BHV_AvoidObstacleV24
 
   polygon    = pts={-58.5,-17.9:-59.67,-15.07:-62.5,-13.9:-65.33,-15.07:-66.5,-17.9:-65.33,-20.73:-62.5,-21.9:-59.67,-20.73}, label=buoy_2
 
-  allowable_ttc     = 20
-  pwt_outer_dist    = 13
-  pwt_inner_dist    = 5.0
+   allowable_ttc     = 20
+  pwt_outer_dist    = 14
+  pwt_inner_dist    = 6.0
   completed_dist    = 500
   min_util_cpa_dist = 4
   max_util_cpa_dist = 8
@@ -94,7 +94,7 @@ Behavior = BHV_AvoidObstacleV24
 Behavior = BHV_AvoidObstacleV24
 {
   name       = avdob_buoy_3
-  pwt        = 3000
+  pwt        = 350
   condition  = AVOID = true
   condition  = MODE==ACTIVE
   condition  = MODE!=ACTIVE:STATION-KEEPING
@@ -103,8 +103,8 @@ Behavior = BHV_AvoidObstacleV24
   polygon    = pts={-91,-28:-92.17,-25.17:-95,-24:-97.83,-25.17:-99,-28:-97.83,-30.83:-95,-32:-92.17,-30.83}, label=buoy_3
 
   allowable_ttc     = 20
-  pwt_outer_dist    = 13
-  pwt_inner_dist    = 5.0
+  pwt_outer_dist    = 14
+  pwt_inner_dist    = 6.0
   completed_dist    = 500
   min_util_cpa_dist = 4
   max_util_cpa_dist = 8
@@ -207,9 +207,11 @@ Behavior = BHV_Waypoint
   // ώστε το Helm να ξέρει εξαρχής ότι περιμένει λίστα διαδρομής (Segment List)
   points         = 0,0
 
+  repeat         = 0
   speed          = 1.2
-  capture_radius = 4.0
-  slip_radius    = 15.0
+  capture_line   = true
+  capture_radius = 3.0
+  slip_radius    = 8.0
 
   visual_hints = vertex_size  = 4
   visual_hints = vertex_color = dodger_blue
