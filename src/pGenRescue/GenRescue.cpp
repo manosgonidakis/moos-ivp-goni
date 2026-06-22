@@ -216,13 +216,15 @@ bool GenRescue::Iterate()
             if(d <= cluster_radius) neighbors++;
           }
 
-          // Time-to-Target (TTT): turning time + straight travel time
+          // Time-to-Target (TTT) με Γραμμική Ορμο-Ποινή
+          // time_turn κλιμακώνεται με ταχύτητα × κανονικοποιημένη γωνία
+          // ώστε υψηλή ταχύτητα + μεγάλη στροφή να τιμωρείται σωστά (BlueBoat sideslip)
           double bearing = atan2(px - current_x, py - current_y) * 180.0 / M_PI;
           if(bearing < 0) bearing += 360.0;
           double heading_error = fabs(current_heading - bearing);
           if(heading_error > 180.0) heading_error = 360.0 - heading_error;
-          double speed = (m_nav_speed < 0.2) ? 1.0 : m_nav_speed;
-          double time_turn     = heading_error / 30.0;
+          double speed         = (m_nav_speed < 0.2) ? 1.0 : m_nav_speed;
+          double time_turn     = (heading_error / 30.0) * (1.0 + speed * (heading_error / 180.0));
           double time_straight = dist / speed;
           double ttt           = time_turn + time_straight;
 
