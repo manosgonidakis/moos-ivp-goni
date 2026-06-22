@@ -150,9 +150,12 @@ bool GenRescue::Iterate()
 
       map<string, XYPoint> remaining_swimmers = m_swimmers;
 
+      bool enemy_known = (m_enemy_x != 0 || m_enemy_y != 0);
+      double cluster_radius = 40.0;
+
       while(!remaining_swimmers.empty()) {
         string best_id = "";
-        double min_distance = -1;
+        double best_score = -1;
         double best_x = 0, best_y = 0;
 
         for(auto const& swimmer_pair : remaining_swimmers) {
@@ -160,22 +163,32 @@ bool GenRescue::Iterate()
           XYPoint point = swimmer_pair.second;
           double px = point.x();
           double py = point.y();
-          
+
           double dist = hypot(px - current_x, py - current_y);
           double dist_to_enemy = hypot(px - m_enemy_x, py - m_enemy_y);
 
-          bool enemy_known = (m_enemy_x != 0 || m_enemy_y != 0);
           if (enemy_known && dist_to_enemy < dist && remaining_swimmers.size() > 1) {
               continue;
           }
 
-          if(min_distance < 0 || dist < min_distance) {
-            min_distance = dist; 
+          // Count neighbors within cluster_radius
+          int neighbors = 0;
+          for(auto const& other : remaining_swimmers) {
+            if(other.first == id) continue;
+            double d = hypot(other.second.x() - px, other.second.y() - py);
+            if(d <= cluster_radius) neighbors++;
+          }
+
+          // Higher score = denser cluster relative to distance
+          double score = (neighbors + 1) / (dist + 1e-6);
+
+          if(score > best_score) {
+            best_score = score;
             best_id = id;
             best_x = px;
             best_y = py;
           }
-        } 
+        }
 
         if(best_id != "") {
           my_path.add_vertex(best_x, best_y);
