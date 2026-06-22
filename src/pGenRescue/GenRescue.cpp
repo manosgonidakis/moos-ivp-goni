@@ -198,7 +198,7 @@ bool GenRescue::Iterate()
           double time_straight = dist / speed;
           double ttt           = time_turn + time_straight;
 
-          double score = (neighbors + 1) / (ttt + 1e-6);
+          double score = ((neighbors + 1) * (neighbors + 1)) / (ttt + 1e-6);
 
           if(score > best_score) {
             best_score = score;
