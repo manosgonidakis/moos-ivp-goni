@@ -160,6 +160,7 @@ bool GenRescue::Iterate()
 
       bool enemy_known = (m_enemy_x != 0 || m_enemy_y != 0);
       double cluster_radius = 40.0;
+      double current_heading = m_nav_heading;
 
       while(!remaining_swimmers.empty()) {
         string best_id = "";
@@ -190,7 +191,7 @@ bool GenRescue::Iterate()
           // Time-to-Target (TTT): turning time + straight travel time
           double bearing = atan2(px - current_x, py - current_y) * 180.0 / M_PI;
           if(bearing < 0) bearing += 360.0;
-          double heading_error = fabs(m_nav_heading - bearing);
+          double heading_error = fabs(current_heading - bearing);
           if(heading_error > 180.0) heading_error = 360.0 - heading_error;
           double speed = (m_nav_speed < 0.2) ? 1.0 : m_nav_speed;
           double time_turn     = heading_error / 30.0;
@@ -208,8 +209,11 @@ bool GenRescue::Iterate()
         }
 
         if(best_id != "") {
+          double next_bearing = atan2(best_x - current_x, best_y - current_y) * 180.0 / M_PI;
+          if(next_bearing < 0) next_bearing += 360.0;
+          current_heading = next_bearing;
           my_path.add_vertex(best_x, best_y);
-          current_x = best_x; 
+          current_x = best_x;
           current_y = best_y;
           remaining_swimmers.erase(best_id); 
         } else {
