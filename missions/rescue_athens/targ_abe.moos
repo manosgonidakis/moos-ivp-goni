@@ -2,7 +2,7 @@ ServerHost = localhost
 ServerPort = 9001
 Community  = abe
 
-MOOSTimeWarp = 30
+MOOSTimeWarp = 50
 
 // Forest Lake
 // LatOrigin  = 43.825300 

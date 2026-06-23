@@ -75,3 +75,13 @@ score1=0  score2=0  dur=950.3  team1=abe  team2=unknown  winner=abe  mtype=rescu
         score1=15, score2=0, dur=351.6, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[RUBY-LIST], mhash_lshort=L-RUBY-LIST, mhash=mhash=260623-1141L-RUBY-LIST,utc=1782204098.19
   score1=15, score2=0, dur=330.9, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[SAME-KIPP], mhash_lshort=W-SAME-KIPP, mhash=mhash=260623-1151W-SAME-KIPP,utc=1782204663.71
   score1=56, score2=0, dur=881.6, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[FAST-RANK], mhash_lshort=E-FAST-RANK, mhash=mhash=260623-1155E-FAST-RANK,utc=1782204918.85
+  score1=15, score2=0, dur=304.5, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[NUMB-POET], mhash_lshort=W-NUMB-POET, mhash=mhash=260623-1158W-NUMB-POET,utc=1782205137.57
+  score1=15, score2=0, dur=312, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[BOLD-HEMP], mhash_lshort=Z-BOLD-HEMP, mhash=mhash=260623-1159Z-BOLD-HEMP,utc=1782205179.80
+  score1=15, score2=0, dur=306.8, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[LIKE-VICE], mhash_lshort=N-LIKE-VICE, mhash=mhash=260623-1200N-LIKE-VICE,utc=1782205219.84
+  score1=15, score2=0, dur=345.4, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[GAMY-PONY], mhash_lshort=Q-GAMY-PONY, mhash=mhash=260623-1200Q-GAMY-PONY,utc=1782205240.82
+  score1=15, score2=0, dur=367.6, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[NEAT-CLEM], mhash_lshort=I-NEAT-CLEM, mhash=mhash=260623-1201I-NEAT-CLEM,utc=1782205262.69
+  score1=15, score2=0, dur=373.6, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[DAFT-WEED], mhash_lshort=R-DAFT-WEED, mhash=mhash=260623-1201R-DAFT-WEED,utc=1782205284.39
+  score1=15, score2=0, dur=322.2, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[NINE-ALAN], mhash_lshort=B-NINE-ALAN, mhash=mhash=260623-1201B-NINE-ALAN,utc=1782205304.70
+    score1=15, score2=0, dur=326.8, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[RARE-ZACK], mhash_lshort=K-RARE-ZACK, mhash=mhash=260623-1202K-RARE-ZACK,utc=1782205348.63
+  score1=15, score2=0, dur=328.9, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[FREE-JOEY], mhash_lshort=R-FREE-JOEY, mhash=mhash=260623-1202R-FREE-JOEY,utc=1782205369.32
+  score1=15, score2=0, dur=378.5, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[NINE-MITT], mhash_lshort=U-NINE-MITT, mhash=mhash=260623-1203U-NINE-MITT,utc=1782205391.50
