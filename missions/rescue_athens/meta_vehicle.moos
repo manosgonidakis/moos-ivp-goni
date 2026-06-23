@@ -96,9 +96,9 @@ ProcessConfig = pGenRescue
   obstacle = x=-62.5,y=-17.9
   obstacle = x=-95,y=-28
 
-  // Field-split optimization: ON και στα δύο οχήματα (competition config).
-  // No-op σε solo· σε 1v1 παραχωρεί clear-losses ώστε να μοιράζεται το πεδίο.
+  // Production config: και τα δύο features ON (no-op σε solo, insurance σε 1v1)
   hard_remove_conceded = true
+  deadlock_escape      = true
 }
 
 //------------------------------------------
