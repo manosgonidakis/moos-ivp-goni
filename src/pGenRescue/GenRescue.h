@@ -47,6 +47,7 @@ class GenRescue : public AppCastingMOOSApp
    // Λίστα (Map) για την αποθήκευση των κολυμβητών: (ID -> XYPoint)
    bool m_first_run_done;
    bool m_returned;
+   bool m_hard_remove_conceded;   // A/B feature flag (από config)
 
    std::map<std::string, XYPoint> m_swimmers;
    std::set<std::string> m_rescued_swimmers;

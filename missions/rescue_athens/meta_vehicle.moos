@@ -96,13 +96,9 @@ ProcessConfig = pGenRescue
   obstacle = x=-62.5,y=-17.9
   obstacle = x=-95,y=-28
 
-#ifdef VNAME abe
-	// foo = true
-#elseifdef VNAME ben
-	// foo = false
-#else
-	// foo = maybe
-#endif
+  // Field-split optimization: ON και στα δύο οχήματα (competition config).
+  // No-op σε solo· σε 1v1 παραχωρεί clear-losses ώστε να μοιράζεται το πεδίο.
+  hard_remove_conceded = true
 }
 
 //------------------------------------------

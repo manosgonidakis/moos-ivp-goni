@@ -99,6 +99,7 @@ GenRescue::GenRescue()
   m_path_update_needed = false;
   m_first_run_done = false;
   m_returned = false;
+  m_hard_remove_conceded = true;   // default ON (no-op σε solo, field-split σε 1v1)
 }
 
 // Destructor
@@ -300,6 +301,23 @@ bool GenRescue::Iterate()
       double cluster_radius = 40.0;
       double current_heading = m_nav_heading;
 
+      // === A/B FEATURE: Hard-Remove Conceded ===
+      // Βγάλε από το planning set τους swimmers που ο (κινούμενος) αντίπαλος
+      // προλαβαίνει ΣΑΦΩΣ (d_enemy < d_you - margin). Έτσι το greedy+2-opt
+      // βελτιστοποιεί tour ΜΟΝΟ γύρω από τους εφικτούς. Fallback: αν αδειάσει
+      // το set, κράτα όλους (μη μείνεις χωρίς στόχο).
+      if(m_hard_remove_conceded && enemy_known && m_enemy_speed > 0.3) {
+        map<string, XYPoint> achievable;
+        for(auto const& sp : remaining_swimmers) {
+          double d_you   = hypot(sp.second.x() - m_nav_x, sp.second.y() - m_nav_y);
+          double d_enemy = hypot(sp.second.x() - m_enemy_x, sp.second.y() - m_enemy_y);
+          if(d_enemy < d_you - 8.0) continue;   // clear concede → εξαίρεση
+          achievable[sp.first] = sp.second;
+        }
+        if(!achievable.empty())
+          remaining_swimmers = achievable;
+      }
+
       while(!remaining_swimmers.empty()) {
         string best_id = "";
         double best_score = -1;
@@ -498,6 +516,10 @@ bool GenRescue::OnStartUp()
         }
         m_obstacles.push_back(XYPoint(ox, oy));
       }
+      else if(param == "hard_remove_conceded") {
+        string v = tolower(stripBlankEnds(value));
+        m_hard_remove_conceded = (v == "true");
+      }
     }
   }
 
@@ -549,6 +571,7 @@ bool GenRescue::buildReport()
          << "  [source: " << m_obstacle_source << "]" << endl;
   m_msgs << "Region Verts (live):     " << m_region.size()
          << (m_region.empty() ? "  [clamp OFF - raw waypoints]" : "  [clamp ON]") << endl;
+  m_msgs << "Hard-Remove Conceded:    " << (m_hard_remove_conceded ? "ON" : "OFF") << endl;
   m_msgs << "Enemy X/Y Position:      [" << m_enemy_x << ", " << m_enemy_y << "]" << endl;
   m_msgs << endl;
   m_msgs << "Rescue Status              " << endl;
