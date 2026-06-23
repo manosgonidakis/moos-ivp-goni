@@ -1,6 +1,6 @@
 ServerHost = localhost
-ServerPort = 9001
-Community  = charlie
+ServerPort = 9002
+Community  = dana
 
 MOOSTimeWarp = 30
 LatOrigin  = 43.825300 
@@ -23,8 +23,6 @@ Processconfig = ANTLER
   Run = pHostInfo        @ NewConsole = false
   Run = uFldNodeBroker   @ NewConsole = false
   Run = pRealm           @ NewConsole = false
-  Run = uFldMessageHandler @ NewConsole = false
-  Run = uTimerScript       @ NewConsole = false
 }
 
 //---------------------------------------------------
@@ -35,7 +33,7 @@ ProcessConfig = pShare
   AppTick   = 2
   CommsTick = 2
 
-  input = route = localhost:9201
+  input = route = localhost:9202
 }
 
 //--------------------------------------------------
@@ -98,7 +96,7 @@ ProcessConfig = uSimMarineV22
   AppTick   = 10
   CommsTick = 10
 
-  start_pos = x=0,y=0,heading=180,speed=0
+  start_pos = x=180,y=0,heading=180,speed=0
   prefix    = NAV
 
 	turn_rate = 80
@@ -117,7 +115,7 @@ ProcessConfig = pHelmIvP
   AppTick    = 4
   CommsTick  = 4
   
-  behaviors    = targ_charlie.bhv  
+  behaviors    = targ_dana.bhv  
   verbose      = false
   Domain       = course:0:359:360
   Domain       = speed:0:5:26
@@ -175,7 +173,7 @@ ProcessConfig = pLogger
   AppTick 	= 5
   CommsTick 	= 5
   
-  File		= LOG_CHARLIE
+  File		= LOG_DANA
   PATH		= ./
   AsyncLog 	= true
   FileTimeStamp = true
@@ -185,54 +183,4 @@ ProcessConfig = pLogger
   WildCardLogging = true 
 }
 	
-ProcessConfig = uFldMessageHandler
-{
-  AppTick    = 2
-  CommsTick  = 2
 
-  strict_addressing = false
-
-  // Recovery: κάθε εισερχόμενο μήνυμα θέτει GOT_MESSAGE=true
-  // ώστε το watchdog timer να ξέρει ότι η επικοινωνία είναι ενεργή
-  msg_flag = GOT_MESSAGE=true
-}
-
-//--------------------------------------------------
-// uTimerScript (1): Periodic re-assign (60-90s)
-
-ProcessConfig = uTimerScript
-{
-  AppTick    = 2
-  CommsTick  = 2
-  script_name = reassign
-
-  condition  = DEPLOY=true
-  randvar    = varname=YPOS, min=-125, max=0, key=at_reset
-
-  event      = var=NODE_MESSAGE_LOCAL, val="src_node=charlie,dest_node=all,var_name=UP_LOITER,string_val=ycenter_assign=$[YPOS]", time=60:90
-
-  reset_max  = nolimit
-  reset_time = all-posted
-}
-
-//--------------------------------------------------
-// uTimerScript (2): Watchdog — αν δεν έρθει μήνυμα εντός 110s,
-// επανέρχεται στο κεντρικό σημείο ώστε τα δύο σκάφη να ξανασμίξουν
-
-ProcessConfig = uTimerScript
-{
-  AppTick    = 2
-  CommsTick  = 2
-  script_name = watchdog
-
-  condition  = DEPLOY=true
-
-  // Αν φτάσει μήνυμα, κάνε reset το watchdog
-  reset_var  = GOT_MESSAGE=true
-
-  // Μετά από 110s χωρίς μήνυμα: επιστροφή στο κοντινό κεντρικό Y=-65
-  event      = var=UP_LOITER, val="ycenter_assign=-65", time=110
-
-  reset_max  = nolimit
-  reset_time = all-posted
-}

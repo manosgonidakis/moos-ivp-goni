@@ -48,6 +48,8 @@ class GenRescue : public AppCastingMOOSApp
    std::map<std::string, XYPoint> m_swimmers;
    std::set<std::string> m_rescued_swimmers;
    std::vector<XYPoint> m_obstacles;
+   std::string m_obstacle_source;
+   std::vector<XYPoint> m_region;
    bool m_path_update_needed;
 
  private: // State variables

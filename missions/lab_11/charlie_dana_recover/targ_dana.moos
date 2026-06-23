@@ -2,7 +2,7 @@ ServerHost = localhost
 ServerPort = 9002
 Community  = dana
 
-MOOSTimeWarp = 15
+MOOSTimeWarp = 30
 LatOrigin  = 43.825300 
 LongOrigin = -70.330400 
 
