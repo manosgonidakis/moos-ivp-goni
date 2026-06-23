@@ -70,3 +70,8 @@ score1=0  score2=0  dur=950.3  team1=abe  team2=unknown  winner=abe  mtype=rescu
   score1=15, score2=0, dur=342, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[FIRM-GRUB], mhash_lshort=D-FIRM-GRUB, mhash=mhash=260623-0902D-FIRM-GRUB,utc=1782194566.89
     score1=15, score2=0, dur=346, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[EDGY-TREE], mhash_lshort=F-EDGY-TREE, mhash=mhash=260623-0903F-EDGY-TREE,utc=1782194601.45
   score1=15, score2=0, dur=328.4, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[LAST-EDGE], mhash_lshort=D-LAST-EDGE, mhash=mhash=260623-0903D-LAST-EDGE,utc=1782194630.62
+  score1=15, score2=0, dur=340.9, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[THIN-THOM], mhash_lshort=F-THIN-THOM, mhash=mhash=260623-0955F-THIN-THOM,utc=1782197742.12
+  score1=15, score2=0, dur=331.4, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[KEEN-LEVI], mhash_lshort=U-KEEN-LEVI, mhash=mhash=260623-1007U-KEEN-LEVI,utc=1782198476.37
+        score1=15, score2=0, dur=351.6, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[RUBY-LIST], mhash_lshort=L-RUBY-LIST, mhash=mhash=260623-1141L-RUBY-LIST,utc=1782204098.19
+  score1=15, score2=0, dur=330.9, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[SAME-KIPP], mhash_lshort=W-SAME-KIPP, mhash=mhash=260623-1151W-SAME-KIPP,utc=1782204663.71
+  score1=56, score2=0, dur=881.6, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[FAST-RANK], mhash_lshort=E-FAST-RANK, mhash=mhash=260623-1155E-FAST-RANK,utc=1782204918.85

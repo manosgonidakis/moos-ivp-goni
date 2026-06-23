@@ -3,6 +3,8 @@
 #include <algorithm>
 #include "MBUtils.h"
 #include "XYSegList.h"
+#include "NodeRecord.h"
+#include "NodeRecordUtils.h"
 #include "GenRescue.h"
 
 using namespace std;
@@ -92,8 +94,11 @@ GenRescue::GenRescue()
   m_nav_speed = 0;
   m_enemy_x = 0;
   m_enemy_y = 0;
+  m_enemy_heading = 0;
+  m_enemy_speed = 0;
   m_path_update_needed = false;
   m_first_run_done = false;
+  m_returned = false;
 }
 
 // Destructor
@@ -130,15 +135,14 @@ bool GenRescue::OnNewMail(MOOSMSG_LIST &NewMail)
       m_nav_speed = msg.GetDouble();
     }
     
-    // 📌 ΝΕΟ: Ενημέρωση της θέσης του αντιπάλου (είτε παίζεις με το 'ben' είπε με το 'abe')
-    else if(key == "NAV_X_BEN" || key == "NAV_X_ABE") {
-      if(m_host_community != msg.GetCommunity()) { // Σιγουρευόμαστε ότι είναι ο άλλος
-        m_enemy_x = msg.GetDouble();
-      }
-    }
-    else if(key == "NAV_Y_BEN" || key == "NAV_Y_ABE") {
-      if(m_host_community != msg.GetCommunity()) {
-        m_enemy_y = msg.GetDouble();
+    // Θέση + heading + speed αντιπάλου μέσω NODE_REPORT (Lab 12 §5.2 — standard channel)
+    else if(key == "NODE_REPORT" && msg.IsString()) {
+      NodeRecord rec = string2NodeRecord(msg.GetString());
+      if(rec.getName() != m_host_community) {   // αγνόησε το δικό μας report
+        m_enemy_x       = rec.getX();
+        m_enemy_y       = rec.getY();
+        m_enemy_heading = rec.getHeading();
+        m_enemy_speed   = rec.getSpeed();
       }
     }
     
@@ -170,7 +174,9 @@ bool GenRescue::OnNewMail(MOOSMSG_LIST &NewMail)
           XYPoint new_swimmer(x, y);
           new_swimmer.set_label(id);
           m_swimmers[id] = new_swimmer;
-          m_path_update_needed = true; 
+          m_path_update_needed = true;
+          // Αν είχαμε γυρίσει σπίτι και έρθει νέος swimmer, ξανα-ενεργοποιήσου
+          if(m_returned) { Notify("RETURN", "false"); m_returned = false; }
       }
     }
     
@@ -196,8 +202,35 @@ bool GenRescue::OnNewMail(MOOSMSG_LIST &NewMail)
           m_swimmers.erase(id);
           m_path_update_needed = true;
       }
-      
+      m_swimmer_approach_times.erase(id);   // καθάρισε τον give-up timer
+
       m_rescued_swimmers.insert(id);
+    }
+
+    // 4. Live όριο επιχείρησης — ΑΝΤΙΚΑΘΙΣΤΑ το hardcoded region.
+    //    Format: "pts={x,y:x,y:...},edge_color=...". Παίρνουμε μόνο το pts={...}.
+    else if(key == "RESCUE_REGION" && msg.IsString()) {
+      string sval = msg.GetString();
+
+      string pts_str = "";
+      size_t p1 = sval.find("pts={");
+      if(p1 != string::npos) {
+        size_t p2 = sval.find("}", p1);
+        if(p2 != string::npos)
+          pts_str = sval.substr(p1 + 5, p2 - (p1 + 5));
+      }
+
+      if(pts_str != "") {
+        vector<string> verts = parseString(pts_str, ':');
+        if(verts.size() >= 3) {        // έγκυρο πολύγωνο πριν αντικαταστήσουμε
+          m_region.clear();
+          for(unsigned int i = 0; i < verts.size(); i++) {
+            string vx = biteStringX(verts[i], ',');
+            string vy = verts[i];
+            m_region.push_back(XYPoint(atof(vx.c_str()), atof(vy.c_str())));
+          }
+        }
+      }
     }
   }
   return(true);
@@ -208,21 +241,49 @@ bool GenRescue::Iterate()
   AppCastingMOOSApp::Iterate();
 
   if(m_swimmers.empty()) {
+    // Assignment 1 (Lab 12): όταν αδειάσει η λίστα αφού έχουμε ήδη δουλέψει
+    // (π.χ. ο τελευταίος swimmer διασώθηκε/αφαιρέθηκε), γύρνα σπίτι.
+    if(m_first_run_done && !m_returned) {
+      Notify("RETURN", "true");
+      m_returned = true;
+    }
     AppCastingMOOSApp::PostReport();
     return(true);
   }
 
-  // --- 1. ΕΛΕΓΧΟΣ ΚΑΙ ΑΠΟΣΤΟΛΗ RESCUE_REQUEST --- [cite: 185]
+  // --- 1. RESCUE_REQUEST + Give-Up Timer (safety-net για μη-σώσιμους swimmers) ---
+  std::vector<std::string> giveup_ids;
   for(auto const& swimmer_pair : m_swimmers) {
     std::string id = swimmer_pair.first;
     XYPoint point = swimmer_pair.second;
-    
+
     double dist = hypot(point.x() - m_nav_x, point.y() - m_nav_y);
 
     if(dist <= 6.5) {
       string request = "vname=" + m_host_community + ",name=" + id;
       Notify("RESCUE_REQUEST", request); // [cite: 185]
     }
+
+    // Give-Up Timer: αν είμαστε <7m για >12s χωρίς FOUND_SWIMMER → μη-σώσιμος
+    // (π.χ. unreg swimmer που θέλει scouting). Τον εγκαταλείπουμε για να μην κολλάμε.
+    if(dist < 7.0) {
+      if(m_swimmer_approach_times.find(id) == m_swimmer_approach_times.end())
+        m_swimmer_approach_times[id] = m_curr_time;            // πρώτη προσέγγιση
+      else if((m_curr_time - m_swimmer_approach_times[id]) > 12.0)
+        giveup_ids.push_back(id);
+    }
+    else {
+      m_swimmer_approach_times.erase(id);  // απομακρυνθήκαμε → reset (απόφυγε false give-up)
+    }
+  }
+
+  // Εφαρμογή give-up εκτός του loop (ασφαλές erase από το m_swimmers)
+  for(unsigned int i = 0; i < giveup_ids.size(); i++) {
+    string gid = giveup_ids[i];
+    m_swimmers.erase(gid);
+    m_swimmer_approach_times.erase(gid);
+    m_path_update_needed = true;
+    reportRunWarning("Giving up on un-rescuable swimmer: " + gid);
   }
 
   // --- 2. ΕΝΗΜΕΡΩΣΗ ΔΙΑΔΡΟΜΗΣ (Με Διορθώσεις Claude Code) ---
@@ -287,8 +348,21 @@ bool GenRescue::Iterate()
           // Ήπιο tie-breaker (+60), ΟΧΙ veto — διεκδικούμε το δίκαιο μερίδιό μας.
           double ttt_penalty = 0.0;
           if (enemy_known && remaining_swimmers.size() > 1) {
+              // (a) Proximity concede: ο αντίπαλος σχεδόν πάνω στον swimmer
               if (dist_to_enemy < 10.0 && dist_to_enemy < dist * 0.66)
                   ttt_penalty = 60.0;
+
+              // (b) Heading concede (Lab 12 §5.2 strategy 2): ο αντίπαλος ΚΙΝΕΙΤΑΙ
+              // και κατευθύνεται προς τον swimmer (relative bearing ~0). Το m_enemy_speed>0.3
+              // αποτρέπει concede σε κολλημένο/νεκρό αντίπαλο.
+              if (m_enemy_speed > 0.3 && dist_to_enemy < 40.0 && dist_to_enemy < dist) {
+                  double brg = atan2(px - m_enemy_x, py - m_enemy_y) * 180.0/M_PI;
+                  if(brg < 0) brg += 360.0;
+                  double dh = fabs(brg - m_enemy_heading);
+                  if(dh > 180.0) dh = 360.0 - dh;
+                  if(dh < 25.0)                 // μέσα στον «κώνο» πορείας του αντιπάλου
+                      ttt_penalty += 80.0;
+              }
           }
 
           // Count neighbors within cluster_radius
@@ -439,11 +513,9 @@ bool GenRescue::OnStartUp()
     m_obstacle_source = "FALLBACK (hardcoded!)";
   }
 
-  // OpRegion polygon (= RESCUE_REGION core_poly) για boundary-aware waypoints
-  m_region.push_back(XYPoint(-215.0,  -2.0));
-  m_region.push_back(XYPoint( -76.0, -86.0));
-  m_region.push_back(XYPoint( -16.0,   6.0));
-  m_region.push_back(XYPoint( -79.0,   4.0));
+  // Το region ΔΕΝ είναι hardcoded πια — έρχεται live από το RESCUE_REGION
+  // (βλ. OnNewMail). Μέχρι να ληφθεί, m_region άδειο → clampInside επιστρέφει
+  // raw waypoints (safety gate), ώστε να ΜΗΝ ξανασυμβεί mis-projection στο νερό.
 
   RegisterVariables();
   return(true);
@@ -459,12 +531,10 @@ void GenRescue::RegisterVariables()
   Register("NAV_SPEED", 0);
   Register("SWIMMER_ALERT", 0); // [cite: 184, 333]
   Register("FOUND_SWIMMER", 0); // [cite: 349]
+  Register("RESCUE_REGION", 0); // live όριο για boundary-aware clamp
 
-  // 📌 Γινόμαστε συνδρομητές στις live θέσεις των δύο πιθανών αντιπάλων
-  Register("NAV_X_BEN", 0);
-  Register("NAV_Y_BEN", 0);
-  Register("NAV_X_ABE", 0);
-  Register("NAV_Y_ABE", 0);
+  // 📌 Θέση/heading/speed αντιπάλου μέσω NODE_REPORT (Lab 12 §5.2)
+  Register("NODE_REPORT", 0);
 }
 
 bool GenRescue::buildReport() 
@@ -477,6 +547,8 @@ bool GenRescue::buildReport()
   m_msgs << "NAV_X/Y Received:        " << (nav_ok ? "true" : "false") << endl;
   m_msgs << "Obstacles Loaded:        " << m_obstacles.size()
          << "  [source: " << m_obstacle_source << "]" << endl;
+  m_msgs << "Region Verts (live):     " << m_region.size()
+         << (m_region.empty() ? "  [clamp OFF - raw waypoints]" : "  [clamp ON]") << endl;
   m_msgs << "Enemy X/Y Position:      [" << m_enemy_x << ", " << m_enemy_y << "]" << endl;
   m_msgs << endl;
   m_msgs << "Rescue Status              " << endl;

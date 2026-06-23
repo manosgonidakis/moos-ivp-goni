@@ -1,8 +1,8 @@
 ServerHost = localhost
-ServerPort = 9001
-Community  = abe
+ServerPort = 9002
+Community  = ben
 
-MOOSTimeWarp = 30
+MOOSTimeWarp = 10
 
 // Forest Lake
 // LatOrigin  = 43.825300 
@@ -57,7 +57,7 @@ ProcessConfig = uSimMarineV22
   AppTick   = 10
   CommsTick = 10
 
-  start_pos = -40,-30
+  start_pos = -44,-36
   prefix    = NAV
 
 	turn_rate = 99
@@ -74,7 +74,7 @@ ProcessConfig = pShare
   AppTick    = 5
   CommsTick  = 5
 
-  input = route = localhost:9201
+  input = route = localhost:9202
 }
 
 	
@@ -118,7 +118,7 @@ ProcessConfig = pHelmIvP
   ok_skew     = any
 
   //app_logging = true
-  behaviors   = targ_abe.bhv  
+  behaviors   = targ_ben.bhv  
   verbose     = false
   domain      = course:0:359:360
   domain      = speed:0:1.6:17
@@ -145,7 +145,7 @@ ProcessConfig = pGenRescue
   obstacle = x=-62.5,y=-17.9
   obstacle = x=-95,y=-28
 
-	// foo = true
+	// foo = false
 }
 
 //------------------------------------------
@@ -156,7 +156,7 @@ ProcessConfig = uTimerScript
   reset_max  = unlimited
 	reset_time = end
 
-  event      = var=RESCUE_REQUEST, val=vname=abe, time=1
+  event      = var=RESCUE_REQUEST, val=vname=ben, time=1
   event      = var=VIEW_POLYGON, val="pts={-31,-6:-32.17,-3.17:-35,-2:-37.83,-3.17:-39,-6:-37.83,-8.83:-35,-10:-32.17,-8.83},label=buoy_1_visible,edge_color=yellow,vertex_color=yellow,fill_color=yellow,fill_transparency=0.35,vertex_size=2,edge_size=2", time=1
   event      = var=VIEW_POLYGON, val="pts={-58.5,-17.9:-59.67,-15.07:-62.5,-13.9:-65.33,-15.07:-66.5,-17.9:-65.33,-20.73:-62.5,-21.9:-59.67,-20.73},label=buoy_2_visible,edge_color=yellow,vertex_color=yellow,fill_color=yellow,fill_transparency=0.35,vertex_size=2,edge_size=2", time=1
   event      = var=VIEW_POLYGON, val="pts={-91,-28:-92.17,-25.17:-95,-24:-97.83,-25.17:-99,-28:-97.83,-30.83:-95,-32:-92.17,-30.83},label=buoy_3_visible,edge_color=yellow,vertex_color=yellow,fill_color=yellow,fill_transparency=0.35,vertex_size=2,edge_size=2", time=1
@@ -246,7 +246,7 @@ ProcessConfig = pNodeReporter
 	platform_type  = KAYAK
 	platform_length = 2
 	
-	platform_color = yellow
+	platform_color = red
 
 	platform_group = 
 
@@ -299,7 +299,7 @@ ProcessConfig = pLogger
   AppTick 	= 10
   CommsTick = 10
   
-  File      = LOG_ABE
+  File      = LOG_BEN
   PATH      = ./
   AsyncLog  = true
   FileTimeStamp = true

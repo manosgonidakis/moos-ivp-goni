@@ -41,12 +41,16 @@ class GenRescue : public AppCastingMOOSApp
    double m_nav_speed;
    double m_enemy_x;
    double m_enemy_y;
+   double m_enemy_heading;
+   double m_enemy_speed;
 
    // Λίστα (Map) για την αποθήκευση των κολυμβητών: (ID -> XYPoint)
-   bool m_first_run_done; 
+   bool m_first_run_done;
+   bool m_returned;
 
    std::map<std::string, XYPoint> m_swimmers;
    std::set<std::string> m_rescued_swimmers;
+   std::map<std::string, double> m_swimmer_approach_times;
    std::vector<XYPoint> m_obstacles;
    std::string m_obstacle_source;
    std::vector<XYPoint> m_region;

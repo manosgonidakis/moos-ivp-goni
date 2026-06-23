@@ -13,6 +13,7 @@ ADD_EXECUTABLE(pGenRescue ${SRC})
 
 TARGET_LINK_LIBRARIES(pGenRescue
    ${MOOS_LIBRARIES}
+   contacts
    geometry
    mbutil
    m
