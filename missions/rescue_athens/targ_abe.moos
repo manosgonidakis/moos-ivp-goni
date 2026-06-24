@@ -2,7 +2,7 @@ ServerHost = localhost
 ServerPort = 9001
 Community  = abe
 
-MOOSTimeWarp = 40
+MOOSTimeWarp = 50
 
 // Forest Lake
 // LatOrigin  = 43.825300 
@@ -145,8 +145,9 @@ ProcessConfig = pGenRescue
   obstacle = x=-62.5,y=-17.9
   obstacle = x=-95,y=-28
 
-  // Production config: και τα δύο features ON (no-op σε solo, insurance σε 1v1)
-  hard_remove_conceded = true
+  // Production config (αποδεδειγμένα ταχύτερο). Το flyby & exact TSP μετρήθηκαν
+  // ΧΕΙΡΟΤΕΡΑ (πιο αργά) — μένουν OFF, διαθέσιμα μόνο ως flags για πειραματισμό.
+  // MAX aggression (μη χάρισμα swimmer) είναι πλέον HARDCODED στον C++ — χωρίς flag.
   deadlock_escape      = true
 }
 
