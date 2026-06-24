@@ -2,7 +2,7 @@ ServerHost = localhost
 ServerPort = 9001
 Community  = abe
 
-MOOSTimeWarp = 50
+MOOSTimeWarp = 30
 
 // Forest Lake
 // LatOrigin  = 43.825300 
@@ -149,6 +149,11 @@ ProcessConfig = pGenRescue
   // ΧΕΙΡΟΤΕΡΑ (πιο αργά) — μένουν OFF, διαθέσιμα μόνο ως flags για πειραματισμό.
   // MAX aggression (μη χάρισμα swimmer) είναι πλέον HARDCODED στον C++ — χωρίς flag.
   deadlock_escape      = true
+
+  // Lab 14: όνομα teammate scout — απαραίτητο για το enemy-pressure (ξεχωρίζει
+  // φίλο/εχθρό). Χωρίς αυτό, το enemy_press μένει OFF για ασφάλεια.
+  teammate             = abe
+  enemy_press          = true
 }
 
 //------------------------------------------
@@ -249,7 +254,7 @@ ProcessConfig = pNodeReporter
 	platform_type  = KAYAK
 	platform_length = 2
 	
-	platform_color = blue
+	platform_color = yellow
 
 	platform_group = 
 

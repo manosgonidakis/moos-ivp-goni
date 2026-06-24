@@ -43,6 +43,7 @@ Processconfig = ANTLER
   Run = uFldMessageHandler @ NewConsole = false
   Run = uTimerScript       @ NewConsole = false
   Run = pRealm             @ NewConsole = false
+  Run = pGenRescue  @ NewConsole = false
 
   Run = uSimMarineV22      @ NewConsole = false
 
@@ -148,6 +149,11 @@ ProcessConfig = pGenRescue
   // ΧΕΙΡΟΤΕΡΑ (πιο αργά) — μένουν OFF, διαθέσιμα μόνο ως flags για πειραματισμό.
   // MAX aggression (μη χάρισμα swimmer) είναι πλέον HARDCODED στον C++ — χωρίς flag.
   deadlock_escape      = true
+
+  // Lab 14: όνομα teammate scout — απαραίτητο για το enemy-pressure (ξεχωρίζει
+  // φίλο/εχθρό). Χωρίς αυτό, το enemy_press μένει OFF για ασφάλεια.
+  teammate             = deb
+  enemy_press          = true
 }
 
 //------------------------------------------
@@ -158,7 +164,10 @@ ProcessConfig = uTimerScript
   reset_max  = unlimited
 	reset_time = end
 
-  event      = var=SCOUT_REQUEST, val="vname=ben,tmate=abe", time=1
+  event      = var=RESCUE_REQUEST, val=vname=ben, time=1
+  event      = var=VIEW_POLYGON, val="pts={-31,-6:-32.17,-3.17:-35,-2:-37.83,-3.17:-39,-6:-37.83,-8.83:-35,-10:-32.17,-8.83},label=buoy_1_visible,edge_color=yellow,vertex_color=yellow,fill_color=yellow,fill_transparency=0.35,vertex_size=2,edge_size=2", time=1
+  event      = var=VIEW_POLYGON, val="pts={-58.5,-17.9:-59.67,-15.07:-62.5,-13.9:-65.33,-15.07:-66.5,-17.9:-65.33,-20.73:-62.5,-21.9:-59.67,-20.73},label=buoy_2_visible,edge_color=yellow,vertex_color=yellow,fill_color=yellow,fill_transparency=0.35,vertex_size=2,edge_size=2", time=1
+  event      = var=VIEW_POLYGON, val="pts={-91,-28:-92.17,-25.17:-95,-24:-97.83,-25.17:-99,-28:-97.83,-30.83:-95,-32:-92.17,-30.83},label=buoy_3_visible,edge_color=yellow,vertex_color=yellow,fill_color=yellow,fill_transparency=0.35,vertex_size=2,edge_size=2", time=1
 }
 
 //------------------------------------------
@@ -242,7 +251,7 @@ ProcessConfig = pNodeReporter
   AppTick     = 6
   CommsTick   = 6
 
-  platform_type  = heron
+	platform_type  = KAYAK
 	platform_length = 2
 	
 	platform_color = blue

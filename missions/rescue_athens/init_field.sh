@@ -140,11 +140,11 @@ if [ "${GAME_FORMAT}" = "r2" ]; then
     echo -e "yellow\nred"    > vcolors.txt
 elif [ "${GAME_FORMAT}" = "rs1" ]; then
     echo -e "rescue\nscout" > vroles.txt
-    echo -e "abe\nabe"      > vmates.txt
+    echo -e "ben\nabe"      > vmates.txt   # abe→ben (ξέρει τον scout του), ben→abe
     echo -e "blue\nblue"    > vcolors.txt
 elif [ "${GAME_FORMAT}" = "rs2" ]; then
     echo -e "rescue\nrescue\nscout\nscout" > vroles.txt
-    echo -e "abe\nben\nabe\nben"           > vmates.txt
+    echo -e "cal\ndeb\nabe\nben"           > vmates.txt   # abe→cal, ben→deb (κάθε rescue ξέρει τον scout της)
     echo -e "green\nblue\ngreen\nblue"     > vcolors.txt
 else # format=r1
     echo "rescue" > vroles.txt
