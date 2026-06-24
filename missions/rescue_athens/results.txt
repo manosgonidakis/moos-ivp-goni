@@ -218,3 +218,42 @@ score1=0  score2=0  dur=950.3  team1=abe  team2=unknown  winner=abe  mtype=rescu
   score1=15, score2=0, dur=346.7, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[SEXY-BAGS], mhash_lshort=F-SEXY-BAGS, mhash=mhash=260624-0937F-SEXY-BAGS,utc=1782283031.86
   score1=15, score2=0, dur=317.5, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[HALF-AREA], mhash_lshort=U-HALF-AREA, mhash=mhash=260624-0937U-HALF-AREA,utc=1782283054.03
   score1=15, score2=0, dur=360.1, team1=abe, team2=unknown, winner=abe, mtype=rescue_r2, mhash_short=[VAIN-TYPE], mhash_lshort=M-VAIN-TYPE, mhash=mhash=260624-0937M-VAIN-TYPE,utc=1782283078.80
+    score1=11, score2=0, dur=160.3, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[CALM-XYAN], mhash_lshort=F-CALM-XYAN, mhash=mhash=260624-1008F-CALM-XYAN,utc=1782284906.64
+  score1=16, score2=0, dur=292.1, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[HIGH-DOOR], mhash_lshort=R-HIGH-DOOR, mhash=mhash=260624-1012R-HIGH-DOOR,utc=1782285165.26
+  score1=21, score2=0, dur=487.4, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[REAR-CASE], mhash_lshort=E-REAR-CASE, mhash=mhash=260624-1013E-REAR-CASE,utc=1782285236.01
+  score1=15, score2=0, dur=330.6, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[AVID-GENE], mhash_lshort=R-AVID-GENE, mhash=mhash=260624-1014R-AVID-GENE,utc=1782285261.36
+  score1=18, score2=0, dur=459.1, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[NUDE-TONE], mhash_lshort=Z-NUDE-TONE, mhash=mhash=260624-1014Z-NUDE-TONE,utc=1782285285.48
+  score1=21, score2=0, dur=462.3, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[THEN-JACK], mhash_lshort=W-THEN-JACK, mhash=mhash=260624-1015W-THEN-JACK,utc=1782285309.62
+  score1=18, score2=0, dur=500.9, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[MEEK-TREE], mhash_lshort=R-MEEK-TREE, mhash=mhash=260624-1015R-MEEK-TREE,utc=1782285333.92
+  score1=22, score2=0, dur=561.4, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[COLD-SNAG], mhash_lshort=R-COLD-SNAG, mhash=mhash=260624-1015R-COLD-SNAG,utc=1782285352.93
+  score1=22, score2=0, dur=488.2, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[SLIM-HACK], mhash_lshort=G-SLIM-HACK, mhash=mhash=260624-1043G-SLIM-HACK,utc=1782287012.83
+  score1=14, score2=0, dur=339.1, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[WARM-ROCK], mhash_lshort=I-WARM-ROCK, mhash=mhash=260624-1043I-WARM-ROCK,utc=1782287035.61
+  score1=20, score2=0, dur=602.2, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[HALS-JUDD], mhash_lshort=R-HALS-JUDD, mhash=mhash=260624-1044R-HALS-JUDD,utc=1782287052.81
+    score1=15, score2=0, dur=329.3, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[TALL-JASE], mhash_lshort=T-TALL-JASE, mhash=mhash=260624-1045T-TALL-JASE,utc=1782287143.77
+  score1=18, score2=0, dur=294.2, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[HUGE-PIKE], mhash_lshort=N-HUGE-PIKE, mhash=mhash=260624-1055N-HUGE-PIKE,utc=1782287716.78
+  score1=20, score2=0, dur=398.9, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[WISE-THOM], mhash_lshort=B-WISE-THOM, mhash=mhash=260624-1055B-WISE-THOM,utc=1782287739.63
+  score1=18, score2=0, dur=438.7, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[COOL-MINT], mhash_lshort=X-COOL-MINT, mhash=mhash=260624-1055X-COOL-MINT,utc=1782287759.00
+  score1=19, score2=0, dur=434.7, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[BARE-SEAM], mhash_lshort=E-BARE-SEAM, mhash=mhash=260624-1056E-BARE-SEAM,utc=1782287780.71
+  score1=21, score2=0, dur=670.6, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[ZANY-SOLO], mhash_lshort=F-ZANY-SOLO, mhash=mhash=260624-1056F-ZANY-SOLO,utc=1782287804.03
+    score1=20, score2=0, dur=463, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[ONLY-POOL], mhash_lshort=A-ONLY-POOL, mhash=mhash=260624-1057A-ONLY-POOL,utc=1782287849.58
+  score1=18, score2=0, dur=383.3, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[UGLY-MAIL], mhash_lshort=I-UGLY-MAIL, mhash=mhash=260624-1057I-UGLY-MAIL,utc=1782287870.34
+  score1=19, score2=0, dur=320.2, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[CUTE-HUCK], mhash_lshort=M-CUTE-HUCK, mhash=mhash=260624-1058M-CUTE-HUCK,utc=1782287927.32
+  score1=19, score2=0, dur=430.1, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[OKAY-RICE], mhash_lshort=B-OKAY-RICE, mhash=mhash=260624-1059B-OKAY-RICE,utc=1782287960.91
+    score1=20, score2=0, dur=485.1, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[IDLE-TENT], mhash_lshort=E-IDLE-TENT, mhash=mhash=260624-1111E-IDLE-TENT,utc=1782288705.74
+  score1=20, score2=0, dur=369.8, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[WIDE-GOAT], mhash_lshort=E-WIDE-GOAT, mhash=mhash=260624-1112E-WIDE-GOAT,utc=1782288724.95
+  score1=18, score2=0, dur=285.1, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[PINK-PLAY], mhash_lshort=J-PINK-PLAY, mhash=mhash=260624-1112J-PINK-PLAY,utc=1782288747.60
+  score1=17, score2=0, dur=375.2, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[ZERO-VIEW], mhash_lshort=U-ZERO-VIEW, mhash=mhash=260624-1112U-ZERO-VIEW,utc=1782288776.28
+  score1=23, score2=0, dur=475.1, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[NICE-IMAC], mhash_lshort=R-NICE-IMAC, mhash=mhash=260624-1113R-NICE-IMAC,utc=1782288800.16
+  score1=13, score2=0, dur=245.6, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[FOUR-WEBB], mhash_lshort=E-FOUR-WEBB, mhash=mhash=260624-1113E-FOUR-WEBB,utc=1782288822.49
+  score1=17, score2=0, dur=282.3, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[MEEK-RAIN], mhash_lshort=M-MEEK-RAIN, mhash=mhash=260624-1114M-MEEK-RAIN,utc=1782288877.69
+    score1=20, score2=0, dur=390.4, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[GAMY-NORM], mhash_lshort=L-GAMY-NORM, mhash=mhash=260624-1115L-GAMY-NORM,utc=1782288947.20
+  score1=19, score2=0, dur=481.3, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[NICE-PAIN], mhash_lshort=M-NICE-PAIN, mhash=mhash=260624-1116M-NICE-PAIN,utc=1782288969.23
+  score1=21, score2=0, dur=539.8, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[RUBY-LINK], mhash_lshort=V-RUBY-LINK, mhash=mhash=260624-1116V-RUBY-LINK,utc=1782288988.93
+  score1=21, score2=0, dur=485.8, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[OOZY-DRIP], mhash_lshort=C-OOZY-DRIP, mhash=mhash=260624-1117C-OOZY-DRIP,utc=1782289034.21
+  score1=16, score2=0, dur=330.7, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[PINK-SHOW], mhash_lshort=R-PINK-SHOW, mhash=mhash=260624-1117R-PINK-SHOW,utc=1782289054.48
+  score1=22, score2=0, dur=550.2, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[GOLD-MASK], mhash_lshort=Z-GOLD-MASK, mhash=mhash=260624-1127Z-GOLD-MASK,utc=1782289638.41
+    score1=16, score2=0, dur=341.9, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[NICE-EBAY], mhash_lshort=D-NICE-EBAY, mhash=mhash=260624-1128D-NICE-EBAY,utc=1782289682.06
+    score1=20, score2=0, dur=398.2, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[DEAR-KNOB], mhash_lshort=V-DEAR-KNOB, mhash=mhash=260624-1128V-DEAR-KNOB,utc=1782289716.96
+  score1=18, score2=0, dur=346.9, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[INKY-JOLT], mhash_lshort=P-INKY-JOLT, mhash=mhash=260624-1128P-INKY-JOLT,utc=1782289735.31
+        score1=19, score2=0, dur=330.8, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[GREY-ISLE], mhash_lshort=G-GREY-ISLE, mhash=mhash=260624-1130G-GREY-ISLE,utc=1782289813.22
+  

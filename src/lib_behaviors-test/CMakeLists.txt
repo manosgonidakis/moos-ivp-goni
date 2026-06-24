@@ -42,6 +42,16 @@ TARGET_LINK_LIBRARIES(BHV_SimpleWaypoint
    logic 
    ivpcore 
    bhvutil 
-   mbutil 
-   geometry 
+   mbutil
+   geometry
    ${SYSTEM_LIBS} )
+
+#--------------------------------------------------------
+#                                              BHV_Pulse
+#--------------------------------------------------------
+ADD_BHV(BHV_Pulse)
+
+#--------------------------------------------------------
+#                                             BHV_ZigLeg
+#--------------------------------------------------------
+ADD_BHV(BHV_ZigLeg)

@@ -217,7 +217,16 @@ if [ "$LOG_CLEAN" = "yes" -a -f "clean.sh" ]; then
 fi
 
 #------------------------------------------------------------
-#  Part 7: Create the .moos and .bhv files. 
+#  Part 6B: Default behavior dir (Lab 14). Τοπικά runs δεν περνούν --bdir,
+#  οπότε δίνουμε default το δικό μας lib ώστε ο helm να βρίσκει το BHV_Scout
+#  ΑΝΕΞΑΡΤΗΤΑ από το IVP_BEHAVIOR_DIRS env.
+#------------------------------------------------------------
+if [ "${BHV_DIR}" = "" ]; then
+    BHV_DIR="${HOME}/moos-ivp-goni/lib"
+fi
+
+#------------------------------------------------------------
+#  Part 7: Create the .moos and .bhv files.
 #------------------------------------------------------------
 NSFLAGS="--strict --force"
 if [ "${AUTO_LAUNCHED}" = "no" ]; then

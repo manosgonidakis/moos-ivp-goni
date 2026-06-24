@@ -47,7 +47,21 @@ class GenRescue : public AppCastingMOOSApp
    // Λίστα (Map) για την αποθήκευση των κολυμβητών: (ID -> XYPoint)
    bool m_first_run_done;
    bool m_returned;
-   bool m_hard_remove_conceded;   // A/B feature flag (από config)
+   bool m_deadlock_escape;        // A/B feature flag (από config)
+   bool m_use_exact_tsp;          // exact TSP (default OFF — μετρήθηκε πιο αργό)
+   bool m_flyby_rescue;           // flyby (default OFF — A/B testing)
+   bool m_cluster_split;          // cluster-based planning (default ON — anti-whipsaw, NO concede)
+   double m_cluster_link_dist;    // single-linkage distance (m) για ομαδοποίηση swimmers
+
+   // Deadlock-Escape state
+   double m_stuck_ref_x;
+   double m_stuck_ref_y;
+   double m_stuck_ref_time;
+   bool   m_stuck_init;
+   double m_escape_until;
+   std::map<std::string, double> m_buoy_blacklist;     // id -> expiry time (temp)
+   std::map<std::string, int>    m_swimmer_escape_count; // id -> πόσες φορές προκάλεσε escape
+   std::set<std::string>         m_abandoned;          // μόνιμα εγκαταλειμμένοι (repeated deadlock)
 
    std::map<std::string, XYPoint> m_swimmers;
    std::set<std::string> m_rescued_swimmers;
