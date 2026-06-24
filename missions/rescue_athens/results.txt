@@ -304,4 +304,8 @@ score1=0  score2=0  dur=950.3  team1=abe  team2=unknown  winner=abe  mtype=rescu
   score1=11, score2=8, dur=950.1, team1=ben, team2=abe, winner=ben, mtype=rescue_r2, mhash_short=[HEAD-FAWN], mhash_lshort=T-HEAD-FAWN, mhash=mhash=260624-1507T-HEAD-FAWN,utc=1782302845.67
   score1=16, score2=2, dur=950.2, team1=ben, team2=abe, winner=ben, mtype=rescue_r2, mhash_short=[COZY-HUGH], mhash_lshort=F-COZY-HUGH, mhash=mhash=260624-1507F-COZY-HUGH,utc=1782302873.71
   score1=11, score2=9, dur=950.3, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[TORY-SOUP], mhash_lshort=E-TORY-SOUP, mhash=mhash=260624-1508E-TORY-SOUP,utc=1782302906.70
-  
+    score1=11, score2=11, dur=524.7, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[COZY-IKER], mhash_lshort=X-COZY-IKER, mhash=mhash=260624-1520X-COZY-IKER,utc=1782303651.19
+  score1=11, score2=10, dur=523.8, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[EPIC-NOVA], mhash_lshort=B-EPIC-NOVA, mhash=mhash=260624-1521B-EPIC-NOVA,utc=1782303671.39
+  score1=16, score2=6, dur=375.5, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[REAL-JAXX], mhash_lshort=V-REAL-JAXX, mhash=mhash=260624-1521V-REAL-JAXX,utc=1782303694.14
+      score1=21, score2=0, dur=718.5, team1=abe, team2=deb, winner=abe, mtype=rescue_r2, mhash_short=[NEAR-HOAX], mhash_lshort=S-NEAR-HOAX, mhash=mhash=260624-1522S-NEAR-HOAX,utc=1782303760.41
+  score1=12, score2=10, dur=646.8, team1=abe, team2=ben, winner=abe, mtype=rescue_r2, mhash_short=[DEAR-MIME], mhash_lshort=W-DEAR-MIME, mhash=mhash=260624-1523W-DEAR-MIME,utc=1782303783.40

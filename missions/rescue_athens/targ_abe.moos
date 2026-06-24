@@ -2,7 +2,7 @@ ServerHost = localhost
 ServerPort = 9001
 Community  = abe
 
-MOOSTimeWarp = 30
+MOOSTimeWarp = 50
 
 // Forest Lake
 // LatOrigin  = 43.825300 
@@ -152,7 +152,7 @@ ProcessConfig = pGenRescue
 
   // Lab 14: όνομα teammate scout — απαραίτητο για το enemy-pressure (ξεχωρίζει
   // φίλο/εχθρό). Χωρίς αυτό, το enemy_press μένει OFF για ασφάλεια.
-  teammate             = abe
+  teammate             = cal
   enemy_press          = true
 }
 
@@ -254,7 +254,7 @@ ProcessConfig = pNodeReporter
 	platform_type  = KAYAK
 	platform_length = 2
 	
-	platform_color = yellow
+	platform_color = green
 
 	platform_group = 
 
