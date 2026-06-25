@@ -1,8 +1,27 @@
 ServerHost = localhost
-ServerPort = $(MOOS_PORT)
-Community  = $(VNAME)
+ServerPort = 9002
+Community  = ben
 
-#include plugs.moos <origin_warp>
+MOOSTimeWarp = 50
+
+// Forest Lake
+// LatOrigin  = 43.825300 
+// LongOrigin = -70.330400 
+
+// MIT Sailing Pavilion (deprecated)
+// LatOrigin  = 42.358456  
+// LongOrigin = -71.087589 
+
+// MIT Sailing Pavilion (updated 4/22/25)
+//LatOrigin  = 42.358436
+//LongOrigin = -71.087448 
+
+// Hellenic Naval Academy, Athens (basin off the Academy)
+// Datum of moos_georef_20260616_081356 chart (Esri World Imagery)
+LatOrigin  = 37.9332599
+LongOrigin = 23.6282166
+	
+
   
 //------------------------------------------------------------
 Processconfig = ANTLER
@@ -24,39 +43,69 @@ Processconfig = ANTLER
   Run = uFldMessageHandler @ NewConsole = false
   Run = uTimerScript       @ NewConsole = false
   Run = pRealm             @ NewConsole = false
-#ifdef VROLE rescue
-  Run = $(PGR=pGenRescue)  @ NewConsole = false
-#endif
+  Run = pGenRescue  @ NewConsole = false
 
-#ifdef XMODE SIM
   Run = uSimMarineV22      @ NewConsole = false
-#elseifdef XMODE M300
-  Run = iM300              @ NewConsole = false
-  Run = iM300Health        @ NewConsole = false
-#elseifdef XMODE BBOAT
-  Run = iBackSeatBroker    @ NewConsole = false
-  Run = pBB_Health         @ NewConsole = false
-  Run = pBB_DGPS_EKF       @ NewConsole = false
-  Run = pThrustMix         @ NewConsole = false
-#endif
 
 }
 
-#ifdef XMODE SIM
-#include plugs.moos <uSimMarineV22>
-#elseifdef XMODE M300
-#include plugs.moos <iM300>
-#include plugs.moos <iM300Health>
-#elseifdef XMODE BBOAT
-#include plugs.moos <iBackSeatBroker>
-#include plugs.moos <pBB_Health>
-#include plugs.moos <pBB_DGPS_EKF>
-#include plugs.moos <pThrustMix>
-#endif
+//------------------------------------------------------
+// uSimMarine Config Block
 
-#include plugs.moos <pShare>
-#include plugs.moos <pHostInfo>
-#include plugs.moos <uProcessWatch>
+ProcessConfig = uSimMarineV22
+{
+  AppTick   = 10
+  CommsTick = 10
+
+  start_pos = -44,-36
+  prefix    = NAV
+
+	turn_rate = 99
+	turn_spd_loss = 0.5
+}
+
+
+
+//---------------------------------------------------------
+// pShare config block
+
+ProcessConfig = pShare
+{
+  AppTick    = 5
+  CommsTick  = 5
+
+  input = route = localhost:9202
+}
+
+	
+//--------------------------------------------------
+// pHostInfo config block
+
+ProcessConfig = pHostInfo
+{
+  AppTick 	= 1
+  CommsTick = 1
+
+  default_hostip_force = localhost
+}
+
+//------------------------------------------
+// uProcessWatch config block
+
+ProcessConfig = uProcessWatch                                   
+{                                                               
+  AppTick   = 4                                                 
+  CommsTick = 4  
+
+  watch_all = true
+  nowatch   = uXMS*
+  nowatch   = uMAC*
+  nowatch   = uPokeDB*
+  nowatch   = uQueryDB*
+
+	summary_wait = 5
+}
+	
 
 //-------------------------------------------
 // pHelmIvP config block
@@ -69,13 +118,13 @@ ProcessConfig = pHelmIvP
   ok_skew     = any
 
   //app_logging = true
-  behaviors   = targ_$(VNAME).bhv  
+  behaviors   = targ_ben.bhv  
   verbose     = false
   domain      = course:0:359:360
   domain      = speed:0:1.6:17
   hold_on_app = pContactMgrV20
 
-	ivp_behavior_dir = $(BHV_DIR)
+	ivp_behavior_dir = /Users/manos/moos-ivp-goni/lib
 	
 	goals_mandatory = true
 
@@ -103,7 +152,7 @@ ProcessConfig = pGenRescue
 
   // Lab 14: όνομα teammate scout — απαραίτητο για το enemy-pressure (ξεχωρίζει
   // φίλο/εχθρό). Χωρίς αυτό, το enemy_press μένει OFF για ασφάλεια.
-  teammate             = $(TMATE)
+  teammate             = deb
   enemy_press          = false
 }
 
@@ -115,14 +164,10 @@ ProcessConfig = uTimerScript
   reset_max  = unlimited
 	reset_time = end
 
-#ifdef VROLE rescue
-  event      = var=RESCUE_REQUEST, val=vname=$(VNAME), time=1
+  event      = var=RESCUE_REQUEST, val=vname=ben, time=1
   event      = var=VIEW_POLYGON, val="pts={-31,-6:-32.17,-3.17:-35,-2:-37.83,-3.17:-39,-6:-37.83,-8.83:-35,-10:-32.17,-8.83},label=buoy_1_visible,edge_color=yellow,vertex_color=yellow,fill_color=yellow,fill_transparency=0.35,vertex_size=2,edge_size=2", time=1
   event      = var=VIEW_POLYGON, val="pts={-58.5,-17.9:-59.67,-15.07:-62.5,-13.9:-65.33,-15.07:-66.5,-17.9:-65.33,-20.73:-62.5,-21.9:-59.67,-20.73},label=buoy_2_visible,edge_color=yellow,vertex_color=yellow,fill_color=yellow,fill_transparency=0.35,vertex_size=2,edge_size=2", time=1
   event      = var=VIEW_POLYGON, val="pts={-91,-28:-92.17,-25.17:-95,-24:-97.83,-25.17:-99,-28:-97.83,-30.83:-95,-32:-92.17,-30.83},label=buoy_3_visible,edge_color=yellow,vertex_color=yellow,fill_color=yellow,fill_transparency=0.35,vertex_size=2,edge_size=2", time=1
-#elseifdef VROLE scout
-  event      = var=SCOUT_REQUEST, val="vname=$(VNAME),tmate=$(TMATE)", time=1
-#endif
 }
 
 //------------------------------------------
@@ -157,7 +202,7 @@ ProcessConfig = uFldNodeBroker
   AppTick   = 1
   CommsTick = 1
 
-  try_shore_host = pshare_route=$(SHORE_IP):$(SHORE_PSHARE)
+  try_shore_host = pshare_route=localhost:9200
 
   bridge = src=COLREGS_AVOID_MODE
   bridge = src=AVDCOL_MODE
@@ -206,20 +251,12 @@ ProcessConfig = pNodeReporter
   AppTick     = 6
   CommsTick   = 6
 
-#ifdef VROLE rescue
 	platform_type  = KAYAK
-#elseifdef VROLE fixed
-	platform_type  = KAYAK
-#elseifdef VROLE scout
-  platform_type  = heron
-#else
-  platform_type  = ship
-#endif
 	platform_length = 2
 	
-	platform_color = $(COLOR)
+	platform_color = blue
 
-	platform_group = $(VUSER="grp")
+	platform_group = 
 
 	allow_color_change = true
 }
@@ -240,22 +277,10 @@ ProcessConfig = pMarinePIDV22
   active_start  = true
 
   // Yaw PID controller (Set for M300)
-#ifdef XMODE SIM
   yaw_pid_kp             = 1.5
   yaw_pid_ki             = 0.5
   yaw_pid_kd             = 0.3 
   yaw_pid_integral_limit = 0.3  
-#elseifdef XMODE M300
-  yaw_pid_kp             = 0.9 
-  yaw_pid_ki             = 0.3
-  yaw_pid_kd             = 0.3 
-  yaw_pid_integral_limit = 0.3
-#elseifdef XMODE BBOAT
-  yaw_pid_kp             = 1.3 
-  yaw_pid_kd             = 0.0 
-  yaw_pid_ki             = 0.0
-  yaw_pid_integral_limit = 0.0
-#endif
    
 
   // Speed PID controller
@@ -282,7 +307,7 @@ ProcessConfig = pLogger
   AppTick 	= 10
   CommsTick = 10
   
-  File      = LOG_%(VNAME)
+  File      = LOG_BEN
   PATH      = ./
   AsyncLog  = true
   FileTimeStamp = true
@@ -304,3 +329,4 @@ ProcessConfig = pLogger
 
   CompressAlogs = false
 }
+

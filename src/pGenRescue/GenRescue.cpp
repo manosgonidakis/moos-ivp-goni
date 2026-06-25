@@ -85,6 +85,31 @@ static XYPoint clampInside(const std::vector<XYPoint>& region, XYPoint p, double
   return XYPoint(px, py);
 }
 
+// Min απόσταση «μέσα» από το όριο: πόσο βαθιά εντός region είναι το (px,py).
+// Αρνητική τιμή = εκτός. Χρησιμοποιεί την ίδια inward-normal λογική με το clampInside.
+static double distInsideRegion(const std::vector<XYPoint>& region, double px, double py)
+{
+  size_t n = region.size();
+  if(n < 3) return 1e9;   // άγνωστο region → μη φιλτράρεις
+
+  double cxg = 0, cyg = 0;
+  for(size_t i = 0; i < n; i++) { cxg += region[i].x(); cyg += region[i].y(); }
+  cxg /= n; cyg /= n;
+
+  double mind = 1e9;
+  for(size_t i = 0; i < n; i++) {
+    double ax = region[i].x(),       ay = region[i].y();
+    double bx = region[(i+1)%n].x(), by = region[(i+1)%n].y();
+    double dx = bx - ax, dy = by - ay, len = hypot(dx, dy);
+    if(len < 1e-9) continue;
+    double nx = -dy/len, ny = dx/len;
+    if((cxg-ax)*nx + (cyg-ay)*ny < 0) { nx = -nx; ny = -ny; }
+    double s = (px-ax)*nx + (py-ay)*ny;
+    if(s < mind) mind = s;
+  }
+  return mind;
+}
+
 // Buoy-clearance: σπρώχνει το waypoint ΑΚΤΙΝΙΚΑ έξω από το κοντινότερο buoy ώστε
 // ο ΣΤΟΧΟΣ να μη βρίσκεται ποτέ μέσα στη ζώνη Allstop του BHV_AvoidObstacleV24
 // (που κηρύσσει "obstacle unavoidable" στα ~<8m από κέντρο buoy και φρενάρει).
@@ -106,6 +131,82 @@ static XYPoint clearOfBuoys(const std::vector<XYPoint>& obstacles, XYPoint p,
   double push = danger - d;
   if(push > push_max) push = push_max;
   return XYPoint(px + dx/d*push, py + dy/d*push);
+}
+
+// Buoy-Detour: για κάθε τμήμα prev→pt, αν η ευθεία περνά < 'clear' από buoy,
+// παρεμβάλλει ένα ενδιάμεσο waypoint που οδηγεί ΓΥΡΩ από το buoy (σε απόσταση
+// 'clear' από το κέντρο). Έτσι η βάρκα δεν μπαίνει ΠΟΤΕ στη ζώνη Allstop κατά
+// το transit μεταξύ swimmers — λύνει το "obstacle unavoidable" εν κινήσει που
+// το 2-opt (που αγνοεί τα buoys) ξαναεισάγει.
+static std::vector<XYPoint> detourBuoys(double sx, double sy,
+                                        const std::vector<XYPoint>& pts,
+                                        const std::vector<XYPoint>& obstacles,
+                                        double clear)
+{
+  std::vector<XYPoint> out;
+  double px = sx, py = sy;
+  for(size_t i = 0; i < pts.size(); i++) {
+    double qx = pts[i].x(), qy = pts[i].y();
+
+    // Βρες το buoy που εισχωρεί ΠΕΡΙΣΣΟΤΕΡΟ στο τμήμα (closest-point < clear)
+    int bi = -1; double worst = clear; double bcx = 0, bcy = 0;
+    for(size_t o = 0; o < obstacles.size(); o++) {
+      double abx = qx-px, aby = qy-py, ab2 = abx*abx + aby*aby, t = 0.0;
+      if(ab2 > 1e-9) {
+        t = ((obstacles[o].x()-px)*abx + (obstacles[o].y()-py)*aby) / ab2;
+        if(t < 0) t = 0; if(t > 1) t = 1;
+      }
+      double cx = px + t*abx, cy = py + t*aby;
+      double d = hypot(obstacles[o].x()-cx, obstacles[o].y()-cy);
+      if(d < worst) { worst = d; bi = (int)o; bcx = cx; bcy = cy; }
+    }
+
+    if(bi >= 0) {
+      // Detour σημείο: σπρώξε το closest-point έξω από το buoy σε απόσταση 'clear'
+      double dx = bcx - obstacles[bi].x(), dy = bcy - obstacles[bi].y(), d = hypot(dx, dy);
+      if(d < 1e-6) {   // τμήμα ακριβώς πάνω στο κέντρο → πάρε κάθετο στο τμήμα
+        double abx = qx-px, aby = qy-py, al = hypot(abx, aby);
+        if(al < 1e-6) { abx = 1; aby = 0; al = 1; }
+        dx = -aby/al; dy = abx/al; d = 1;
+      }
+      out.push_back(XYPoint(obstacles[bi].x() + dx/d*clear,
+                            obstacles[bi].y() + dy/d*clear));
+    }
+    out.push_back(pts[i]);
+    px = qx; py = qy;
+  }
+  return out;
+}
+
+// Inside-Approach: για waypoints κοντά στο όριο, παρεμβάλλει ένα approach-waypoint
+// που βρίσκεται 'approach_dist' ΠΡΟΣ ΤΟ ΚΕΝΤΡΟ. Έτσι η βάρκα φτάνει στον swimmer
+// ερχόμενη ΑΠΟ ΜΕΣΑ (σύντομο τελικό leg, λιγότερο momentum προς τα έξω) αντί να
+// τρέχει κατευθείαν στο όριο και να ξεφεύγει εκτός (OpRegion halt). Ρίζα-λύση
+// για τα boundary freezes.
+static std::vector<XYPoint> approachFromInside(const std::vector<XYPoint>& region,
+                                               const std::vector<XYPoint>& pts,
+                                               double edge_thresh, double approach_dist)
+{
+  if(region.size() < 3) return pts;
+  double cx = 0, cy = 0;
+  for(size_t i = 0; i < region.size(); i++) { cx += region[i].x(); cy += region[i].y(); }
+  cx /= region.size(); cy /= region.size();
+
+  std::vector<XYPoint> out;
+  for(size_t i = 0; i < pts.size(); i++) {
+    double ed = distInsideRegion(region, pts[i].x(), pts[i].y());
+    if(ed < edge_thresh) {
+      double vx = cx - pts[i].x(), vy = cy - pts[i].y(), vl = hypot(vx, vy);
+      if(vl > 1e-6) {
+        XYPoint ap = clampInside(region,
+                       XYPoint(pts[i].x() + vx/vl*approach_dist,
+                               pts[i].y() + vy/vl*approach_dist), 8.0);
+        out.push_back(ap);     // πρώτα μπες μέσα...
+      }
+    }
+    out.push_back(pts[i]);     // ...μετά πήγαινε στον swimmer (σύντομο leg από μέσα)
+  }
+  return out;
 }
 
 // Edge cost: Ευκλείδεια απόσταση + buoy penalty (αν το τμήμα a→b περνά <12m από buoy,
@@ -345,6 +446,34 @@ GenRescue::GenRescue()
   m_flyby_rescue = false;          // default OFF (A/B)
   m_cluster_split = true;          // default ON — clustering χωρίς concede (anti-whipsaw)
   m_cluster_link_dist = 40.0;      // swimmers <=40m → ίδιο «οικόπεδο»
+  m_buoy_block = 5.0;              // buoy ακτίνα ~4m + 1m → αγνόησε ΜΟΝΟ όσους είναι
+                                   // ουσιαστικά ΜΕΣΑ στο buoy. Τους 5-10m τους διεκδικούμε
+                                   // (clearOfBuoys + detour + inside-approach τους χειρίζονται).
+  m_edge_block = 5.0;              // swimmer <5m από το όριο → επικίνδυνο, μην τον στοχεύεις
+  m_inside_approach = true;        // πλησίασε boundary swimmers ΑΠΟ ΜΕΣΑ (anti edge-freeze)
+  m_approach_edge = 15.0;          // swimmer <15m από όριο → inside approach
+  m_approach_dist = 15.0;          // approach-waypoint 15m προς το κέντρο
+  m_teammate   = "";               // ΚΕΝΟ default: το σωστό όνομα scout έρχεται από
+                                   // config (teammate=$(TMATE)). ΜΗΝ hardcode όνομα —
+                                   // στο rs2 ο scout είναι "cal" όχι "ben"! Αν μείνει
+                                   // κενό/self → press & defend αυτόματα OFF (no friendly-fire).
+  m_enemy_press = false;           // OFF default: ρισκάρει edge-drift/freeze (μετρήθηκε).
+                                   // Άναψέ το από config μόνο αν θες το shepherding.
+  m_press_edge  = 16.0;            // enemy <16m από όριο → υποψήφιος για pressure
+  m_press_range = 18.0;            // ΟΠΟΡΤΟΥΝΙΣΤΙΚΟ: μόνο αν είσαι ΗΔΗ <18m (όχι κυνήγι)
+  m_press_gap   = 13.0;            // πλησιάζουμε στα 13m (καμία σύγκρουση· enemy avoidance ~15m)
+  m_press_dur   = 4.0;             // σύντομη σπρωξιά 4s
+  m_press_cd    = 20.0;            // μετά 20s cooldown → γύρνα στη ΒΑΣΙΚΗ δουλειά
+  m_press_until = 0.0;
+  m_press_cd_until = 0.0;
+  m_self_defend  = true;           // άμυνα: μη σε στριμώξουν στο όριο
+  m_defend_edge  = 18.0;           // <18m από όριο → ευάλωτος
+  m_defend_range = 20.0;           // εχθρός <20m → απειλή
+  m_defend_push  = 25.0;           // τραβήξου 25m προς το κέντρο
+  m_defend_dur   = 4.0;            // σύντομη αμυντική κίνηση 4s
+  m_defend_cd    = 10.0;           // 10s cooldown (πιο responsive, είναι προστατευτικό)
+  m_defend_until = 0.0;
+  m_defend_cd_until = 0.0;
   m_stuck_ref_x = 0;
   m_stuck_ref_y = 0;
   m_stuck_ref_time = 0;
@@ -389,11 +518,15 @@ bool GenRescue::OnNewMail(MOOSMSG_LIST &NewMail)
     // Θέση + heading + speed αντιπάλου μέσω NODE_REPORT (Lab 12 §5.2 — standard channel)
     else if(key == "NODE_REPORT" && msg.IsString()) {
       NodeRecord rec = string2NodeRecord(msg.GetString());
-      if(rec.getName() != m_host_community) {   // αγνόησε το δικό μας report
+      string rname = tolower(rec.getName());
+      if(rname != tolower(m_host_community)) {   // αγνόησε το δικό μας report
         m_enemy_x       = rec.getX();
         m_enemy_y       = rec.getY();
         m_enemy_heading = rec.getHeading();
         m_enemy_speed   = rec.getSpeed();
+        // Κράτα ΟΛΑ τα άλλα οχήματα (όνομα→θέση) για να ξεχωρίζουμε εχθρούς
+        // από τον teammate scout στο enemy-pressure.
+        m_contacts[rname] = XYPoint(rec.getX(), rec.getY());
       }
     }
     
@@ -563,6 +696,59 @@ bool GenRescue::Iterate()
       // reset checkpoint (παράθυρο)
       m_stuck_ref_x = m_nav_x; m_stuck_ref_y = m_nav_y; m_stuck_ref_time = m_curr_time;
 
+      // BOUNDARY-RECOVERY (ΠΡΟΤΕΡΑΙΟΤΗΤΑ): αν κολλήσαμε ΚΟΝΤΑ/ΕΚΤΟΣ ορίου (το OpRegion
+      // μας έκανε halt στην άκρη — π.χ. μας έσπρωξε ο AvdColregs στο congested start),
+      // οδήγησε ΔΥΝΑΜΙΚΑ & ΒΑΘΙΑ προς το κέντρο για να ξεκολλήσεις και να μπεις πάλι μέσα.
+      if(net < 6.0 && m_region.size() >= 3) {
+        double ed = distInsideRegion(m_region, m_nav_x, m_nav_y);
+        if(ed < 3.5) {   // ΜΟΝΟ στη ζώνη halt (όχι νόμιμο edge-rescue στα ~5m clamp)
+          double cx = 0, cy = 0;
+          for(unsigned int i = 0; i < m_region.size(); i++) { cx += m_region[i].x(); cy += m_region[i].y(); }
+          cx /= m_region.size(); cy /= m_region.size();
+          double vx = cx - m_nav_x, vy = cy - m_nav_y, vl = hypot(vx, vy);
+          if(vl < 1e-6) { vx = 1; vy = 0; vl = 1; }
+          XYPoint rec = clampInside(m_region,
+                          XYPoint(m_nav_x + vx/vl*40.0, m_nav_y + vy/vl*40.0), 8.0);
+          // BUOY-AWARE: η διαδρομή προς το recovery point να ΜΗΝ περνά μέσα από buoy
+          // (αλλιώς κολλάει σε Allstop εκεί). Detour + clear, όπως στο κανονικό tour.
+          std::vector<XYPoint> rp; rp.push_back(rec);
+          std::vector<XYPoint> rrouted = detourBuoys(m_nav_x, m_nav_y, rp, m_obstacles, 13.0);
+          XYSegList rseg;
+          for(unsigned int k = 0; k < rrouted.size(); k++) {
+            XYPoint rs = clampInside(m_region, clearOfBuoys(m_obstacles, rrouted[k], 12.0, 4.0), 8.0);
+            rseg.add_vertex(rs.x(), rs.y());
+          }
+          Notify("RESCUE_UPDATES", "points=" + rseg.get_spec());
+          Notify("PGR_BOUNDARY_RECOVER", "stuck_at=" + doubleToStringX(m_nav_x,1)
+                 + "," + doubleToStringX(m_nav_y,1) + ",edge=" + doubleToStringX(ed,1));
+
+          // ANTI YO-YO: blacklist τον swimmer που μας κόλλησε στο όριο (τον κοντινότερο
+          // στη θέση μας), ώστε να ΜΗΝ τον ξανα-στοχεύσουμε αμέσως → τέλος ο βρόχος
+          // halt→recover→ίδιος edge swimmer→halt. 25s temp· 2η φορά → μόνιμη εγκατάλειψη.
+          string cul = ""; double cbd = 1e9;
+          for(auto const& sp : m_swimmers) {
+            double d = hypot(sp.second.x()-m_nav_x, sp.second.y()-m_nav_y);
+            if(d < cbd) { cbd = d; cul = sp.first; }
+          }
+          if(cul != "") {
+            m_swimmer_escape_count[cul]++;
+            if(m_swimmer_escape_count[cul] >= 3) {   // 3 ευκαιρίες πριν μόνιμη εγκατάλειψη
+              m_swimmers.erase(cul); m_abandoned.insert(cul);
+              m_buoy_blacklist.erase(cul); m_swimmer_approach_times.erase(cul);
+              reportRunWarning("BOUNDARY: permanently abandoning edge-stuck " + cul);
+            } else {
+              m_buoy_blacklist[cul] = m_curr_time + 20.0;   // temp: ξαναδοκίμασε από άλλη γωνία
+            }
+          }
+
+          m_escape_until = m_curr_time + 8.0;
+          m_stuck_init = false;
+          m_path_update_needed = true;
+          AppCastingMOOSApp::PostReport();
+          return(true);
+        }
+      }
+
       // Κοντινότερο buoy από την ΤΩΡΙΝΗ θέση
       double best_bd = 1e9; int bi = -1;
       for(unsigned int oi = 0; oi < m_obstacles.size(); oi++) {
@@ -612,6 +798,101 @@ bool GenRescue::Iterate()
     }
   }
 
+  // --- 1b2. SELF-DEFENSE ---
+  // Αν εχθρός (όχι teammate) μας πλησιάζει ΕΝΩ είμαστε κοντά στο όριο και βρίσκεται
+  // πιο «μέσα» από εμάς (μας σπρώχνει προς τα έξω), ΤΡΑΒΗΞΟΥ προς το κέντρο πριν μας
+  // παγώσει το OpRegion (halt_dist=4.5m) στην άκρη. Προτεραιότητα πάνω από το press.
+  if(m_self_defend && m_region.size() >= 3 && !m_contacts.empty() &&
+     m_first_run_done && !m_swimmers.empty()) {
+    double my_edist = distInsideRegion(m_region, m_nav_x, m_nav_y);
+    bool active = (m_curr_time < m_defend_until);          // ήδη σε αμυντική κίνηση
+    bool can_start = (m_curr_time >= m_defend_cd_until);   // πέρασε το cooldown
+    if(my_edist < m_defend_edge && (active || can_start)) {  // ευάλωτοι + επιτρέπεται
+      bool threat = false;
+      for(auto const& c : m_contacts) {
+        if(c.first == m_teammate) continue;         // ο δικός μας scout δεν είναι απειλή
+        double d = hypot(c.second.x()-m_nav_x, c.second.y()-m_nav_y);
+        if(d > m_defend_range) continue;
+        double e_edist = distInsideRegion(m_region, c.second.x(), c.second.y());
+        if(e_edist > my_edist + 2.0) { threat = true; break; }  // εχθρός πιο μέσα → μας στριμώχνει
+      }
+      if(threat) {
+        if(!active) {   // ξεκίνα νέα αμυντική κίνηση + κλείδωσε cooldown
+          m_defend_until    = m_curr_time + m_defend_dur;
+          m_defend_cd_until = m_curr_time + m_defend_dur + m_defend_cd;
+        }
+        double cx = 0, cy = 0;
+        for(unsigned int i = 0; i < m_region.size(); i++) { cx += m_region[i].x(); cy += m_region[i].y(); }
+        cx /= m_region.size(); cy /= m_region.size();
+        double vx = cx - m_nav_x, vy = cy - m_nav_y, vl = hypot(vx, vy);
+        if(vl < 1e-6) { vx = 1; vy = 0; vl = 1; }
+        XYPoint safe = clampInside(m_region, XYPoint(m_nav_x + vx/vl*m_defend_push,
+                                                     m_nav_y + vy/vl*m_defend_push), 8.0);
+        Notify("RESCUE_UPDATES", "points=" + doubleToStringX(safe.x(),2)
+                                      + "," + doubleToStringX(safe.y(),2));
+        Notify("PGR_SELF_DEFEND", "my_edge=" + doubleToStringX(my_edist,1)
+               + ",fleeing_to=" + doubleToStringX(safe.x(),1) + "," + doubleToStringX(safe.y(),1));
+        m_path_update_needed = true;
+        AppCastingMOOSApp::PostReport();
+        return(true);
+      }
+    }
+  }
+
+  // --- 1c. ENEMY-PRESSURE (legal shepherding) ---
+  // Όταν ΕΧΘΡΟΣ (όχι ο teammate scout) είναι κοντά στο όριο ΚΑΙ κοντά μας,
+  // στοχεύουμε ένα σημείο press_gap «μέσα» του (προς το κέντρο). Καθώς πλησιάζουμε,
+  // η ΔΙΚΗ ΤΟΥ collision-avoidance τον σπρώχνει μακριά μας → προς τα έξω. ΚΑΜΙΑ
+  // σύγκρουση (press_gap=13m >> collision range). Opportunistic & σύντομο.
+  // Απαιτεί teammate set (αλλιώς δεν ξεχωρίζουμε φίλο/εχθρό → off για ασφάλεια).
+  bool press_active   = (m_curr_time < m_press_until);
+  bool press_canstart = (m_curr_time >= m_press_cd_until);
+  if(m_enemy_press && m_teammate != "" && m_teammate != tolower(m_host_community) &&
+     m_region.size() >= 3 && !m_contacts.empty() && m_first_run_done && !m_swimmers.empty() &&
+     (press_active || press_canstart)) {
+
+    // Μην εγκαταλείπεις εύκολη κοντινή διάσωση για να κυνηγήσεις εχθρό
+    double nearest_sw = 1e9;
+    for(auto const& sp : m_swimmers) {
+      double d = hypot(sp.second.x()-m_nav_x, sp.second.y()-m_nav_y);
+      if(d < nearest_sw) nearest_sw = d;
+    }
+
+    if(nearest_sw > 15.0) {
+      double cx = 0, cy = 0;
+      for(unsigned int i = 0; i < m_region.size(); i++) { cx += m_region[i].x(); cy += m_region[i].y(); }
+      cx /= m_region.size(); cy /= m_region.size();
+
+      string best = ""; double best_edist = m_press_edge; double ex = 0, ey = 0;
+      for(auto const& c : m_contacts) {
+        if(c.first == m_teammate) continue;                  // μη σπρώχνεις τον δικό σου
+        double mydist = hypot(c.second.x()-m_nav_x, c.second.y()-m_nav_y);
+        if(mydist > m_press_range) continue;                 // opportunistic μόνο
+        double ed = distInsideRegion(m_region, c.second.x(), c.second.y());
+        if(ed < best_edist) { best_edist = ed; best = c.first; ex = c.second.x(); ey = c.second.y(); }
+      }
+
+      if(best != "") {
+        if(!press_active) {   // ξεκίνα νέα σπρωξιά + κλείδωσε cooldown
+          m_press_until    = m_curr_time + m_press_dur;
+          m_press_cd_until = m_curr_time + m_press_dur + m_press_cd;
+        }
+        double vx = cx - ex, vy = cy - ey, vl = hypot(vx, vy);
+        if(vl < 1e-6) { vx = 1; vy = 0; vl = 1; }
+        // Σημείο press_gap «μέσα» από τον εχθρό (στην πλευρά του κέντρου)
+        XYPoint pp = clampInside(m_region, XYPoint(ex + vx/vl*m_press_gap,
+                                                   ey + vy/vl*m_press_gap), 5.0);
+        Notify("RESCUE_UPDATES", "points=" + doubleToStringX(pp.x(),2)
+                                      + "," + doubleToStringX(pp.y(),2));
+        Notify("PGR_ENEMY_PRESS", "enemy=" + best + ",ex=" + doubleToStringX(ex,1)
+               + ",ey=" + doubleToStringX(ey,1) + ",edge=" + doubleToStringX(best_edist,1));
+        m_path_update_needed = true;   // όταν λήξει το pressure, ξαναχτίσε tour
+        AppCastingMOOSApp::PostReport();
+        return(true);
+      }
+    }
+  }
+
   // --- 2. ΕΝΗΜΕΡΩΣΗ ΔΙΑΔΡΟΜΗΣ (Με Διορθώσεις Claude Code) ---
   // Αντικαταστήσαμε το static με το μέλος m_first_run_done
   if (m_path_update_needed || (!m_first_run_done && !m_swimmers.empty())) {
@@ -631,6 +912,34 @@ bool GenRescue::Iterate()
           avail[sp.first] = sp.second;
         }
         if(!avail.empty()) remaining_swimmers = avail;
+      }
+
+      // Danger-Block: ΜΗΝ στοχεύεις swimmers που είναι (α) μέσα/κοντά σε buoy
+      // (<m_buoy_block από κέντρο) ή (β) πολύ κοντά στο ΟΡΙΟ (<m_edge_block μέσα
+      // από την περιφέρεια). Και στις δύο περιπτώσεις η προσέγγιση είναι επικίνδυνη
+      // (Allstop buoy / OpRegion halt στην άκρη) και οδηγεί σε γύρω-γύρω. Τους
+      // ΚΡΑΤΑΜΕ στο m_swimmers (incidental rescue), απλώς εκτός tour.
+      // Fallback: αν αδειάσει το set, κράτα όλους (μη μείνεις χωρίς στόχο).
+      if((m_buoy_block > 0 && !m_obstacles.empty()) ||
+         (m_edge_block > 0 && m_region.size() >= 3)) {
+        map<string, XYPoint> reachable;
+        for(auto const& sp : remaining_swimmers) {
+          bool blocked = false;
+          // (α) μέσα σε buoy
+          if(m_buoy_block > 0) {
+            for(unsigned int oi = 0; oi < m_obstacles.size(); oi++) {
+              if(hypot(sp.second.x()-m_obstacles[oi].x(),
+                       sp.second.y()-m_obstacles[oi].y()) < m_buoy_block) { blocked = true; break; }
+            }
+          }
+          // (β) στην περιφέρεια του ορίου
+          if(!blocked && m_edge_block > 0 && m_region.size() >= 3) {
+            if(distInsideRegion(m_region, sp.second.x(), sp.second.y()) < m_edge_block)
+              blocked = true;
+          }
+          if(!blocked) reachable[sp.first] = sp.second;
+        }
+        if(!reachable.empty()) remaining_swimmers = reachable;
       }
 
       double cluster_radius = 40.0;
@@ -711,10 +1020,20 @@ bool GenRescue::Iterate()
 
       // Boundary-aware: τράβα κάθε waypoint >=5m μέσα από το όριο ώστε η βάρκα
       // να μην στοχεύει ποτέ στη halt ζώνη του OpRegion (halt_dist=4.5m).
+      // Inside-Approach: για boundary swimmers, μπες πρώτα προς το κέντρο → φτάνεις
+      // από μέσα (anti edge-freeze). Πριν το detour/clamp ώστε να περάσουν κι αυτά.
+      std::vector<XYPoint> approached = m_inside_approach
+        ? approachFromInside(m_region, ordered_pts, m_approach_edge, m_approach_dist)
+        : ordered_pts;
+
+      // Buoy-Detour: παρεμβάλλει waypoints ΓΥΡΩ από buoys σε τμήματα που τα
+      // διασχίζουν (το 2-opt τα αγνοεί). clear=13m → η βάρκα μένει ~9m από edge.
+      std::vector<XYPoint> routed = detourBuoys(m_nav_x, m_nav_y, approached, m_obstacles, 13.0);
+
       XYSegList my_path;
-      for(unsigned int k = 0; k < ordered_pts.size(); k++) {
+      for(unsigned int k = 0; k < routed.size(); k++) {
         // 1) Σπρώξε τον στόχο έξω από ζώνη buoy (αποφυγή AvoidObstacle Allstop)
-        XYPoint cleared = clearOfBuoys(m_obstacles, ordered_pts[k], 12.0, 4.0);
+        XYPoint cleared = clearOfBuoys(m_obstacles, routed[k], 12.0, 4.0);
         // 2) Μετά κράτα τον εντός ορίου (boundary-aware)
         XYPoint safe = clampInside(m_region, cleared, 5.0);
         my_path.add_vertex(safe.x(), safe.y());
@@ -779,6 +1098,54 @@ bool GenRescue::OnStartUp()
         double d = atof(stripBlankEnds(value).c_str());
         if(d > 0) m_cluster_link_dist = d;
       }
+      else if(param == "buoy_block") {
+        double d = atof(stripBlankEnds(value).c_str());
+        if(d >= 0) m_buoy_block = d;
+      }
+      else if(param == "edge_block") {
+        double d = atof(stripBlankEnds(value).c_str());
+        if(d >= 0) m_edge_block = d;
+      }
+      else if(param == "inside_approach") {
+        m_inside_approach = (tolower(stripBlankEnds(value)) == "true");
+      }
+      else if(param == "approach_edge") { double d=atof(stripBlankEnds(value).c_str()); if(d>=0) m_approach_edge=d; }
+      else if(param == "approach_dist") { double d=atof(stripBlankEnds(value).c_str()); if(d>0)  m_approach_dist=d; }
+      else if(param == "teammate") {
+        // Δέξου ΜΟΝΟ έγκυρο όνομα (μη-κενό, μη-self). Έτσι αν το $(TMATE) λυθεί
+        // σε κενό ή στο όνομά μας, ΔΕΝ χαλάει το (ασφαλές) default → press/defend OFF.
+        string tm = tolower(stripBlankEnds(value));
+        if(tm != "" && tm != tolower(m_host_community) && tm != "$(tmate)")
+          m_teammate = tm;
+      }
+      else if(param == "enemy_press") {
+        m_enemy_press = (tolower(stripBlankEnds(value)) == "true");
+      }
+      else if(param == "press_edge") {
+        double d = atof(stripBlankEnds(value).c_str()); if(d >= 0) m_press_edge = d;
+      }
+      else if(param == "press_range") {
+        double d = atof(stripBlankEnds(value).c_str()); if(d >= 0) m_press_range = d;
+      }
+      else if(param == "press_gap") {
+        double d = atof(stripBlankEnds(value).c_str()); if(d > 0) m_press_gap = d;
+      }
+      else if(param == "self_defend") {
+        m_self_defend = (tolower(stripBlankEnds(value)) == "true");
+      }
+      else if(param == "defend_edge") {
+        double d = atof(stripBlankEnds(value).c_str()); if(d >= 0) m_defend_edge = d;
+      }
+      else if(param == "defend_range") {
+        double d = atof(stripBlankEnds(value).c_str()); if(d >= 0) m_defend_range = d;
+      }
+      else if(param == "defend_push") {
+        double d = atof(stripBlankEnds(value).c_str()); if(d > 0) m_defend_push = d;
+      }
+      else if(param == "press_dur")  { double d=atof(stripBlankEnds(value).c_str()); if(d>0) m_press_dur=d; }
+      else if(param == "press_cd")   { double d=atof(stripBlankEnds(value).c_str()); if(d>=0) m_press_cd=d; }
+      else if(param == "defend_dur") { double d=atof(stripBlankEnds(value).c_str()); if(d>0) m_defend_dur=d; }
+      else if(param == "defend_cd")  { double d=atof(stripBlankEnds(value).c_str()); if(d>=0) m_defend_cd=d; }
     }
   }
 
@@ -833,6 +1200,15 @@ bool GenRescue::buildReport()
   m_msgs << "Aggressive (no concede): ALWAYS ON  [hardcoded — no swimmer conceded]" << endl;
   m_msgs << "Cluster-Split Planning:  " << (m_cluster_split ? "ON" : "OFF")
          << "  [link_dist=" << m_cluster_link_dist << "m, NO concede]" << endl;
+  m_msgs << "Buoy-Block (skip near):  " << m_buoy_block << "m  [swimmers σε buoy ΔΕΝ στοχεύονται]" << endl;
+  m_msgs << "Edge-Block (skip near):  " << m_edge_block << "m  [swimmers στην περιφέρεια ΔΕΝ στοχεύονται]" << endl;
+  m_msgs << "Inside-Approach:         " << (m_inside_approach ? "ON" : "OFF")
+         << "  [edge=" << m_approach_edge << "m, dist=" << m_approach_dist << "m]" << endl;
+  m_msgs << "Enemy-Press:             " << (m_enemy_press ? "ON" : "OFF")
+         << "  [tmate=" << (m_teammate==""?"(unset→OFF)":m_teammate)
+         << ", range=" << m_press_range << "m, dur=" << m_press_dur << "s, cd=" << m_press_cd << "s]" << endl;
+  m_msgs << "Self-Defend:             " << (m_self_defend ? "ON" : "OFF")
+         << "  [edge=" << m_defend_edge << "m, dur=" << m_defend_dur << "s, cd=" << m_defend_cd << "s]" << endl;
   m_msgs << "Deadlock-Escape:         " << (m_deadlock_escape ? "ON" : "OFF")
          << "  [blacklist:" << m_buoy_blacklist.size()
          << " abandoned:" << m_abandoned.size() << "]" << endl;

@@ -7,6 +7,7 @@
 
 #include <cstdlib>
 #include <math.h>
+#include <algorithm>
 #include "BHV_Scout.h"
 #include "MBUtils.h"
 #include "AngleUtils.h"
@@ -35,14 +36,16 @@ BHV_Scout::BHV_Scout(IvPDomain gdomain) :
 
   // All distances are in meters, all speed in meters per second
   // Default values for configuration parameters
-  m_desired_speed  = 1;
-  m_capture_radius = 10;
-  m_lane_width     = 15;   // απόσταση γραμμών σάρωσης (≈ 2× sensor radius)
-  m_avoid_radius   = 30;   // hint του Lab: μη σκαουτάρεις <30m από rescue
-  m_known_radius   = 0;    // OFF by default: 30m×πολλούς swimmers απέκλειε ΟΛΟ το grid
-                           // (ταλάντωση/μη-κάλυψη). Το rescue-avoidance αρκεί δυναμικά.
-                           // Βάλε >0 στο config μόνο αν θες ελαφρύ known-swimmer skip.
-  m_inset          = 10;   // τράβα τα endpoints 10m μέσα → no overshoot εκτός ορίου
+  m_desired_speed  = 2;    // πιο γρήγορος → καλύπτει περισσότερο χώρο στον διαθέσιμο χρόνο
+  m_capture_radius = 8;
+  m_lane_width     = 6;    // ανίχνευση αξιόπιστη <3m → lanes 6m (±3m) → ΚΑΝΕΝΑ gap
+  m_avoid_radius   = 15;   // 30m έσβηνε τεράστια κάλυψη· το rescue σκαουτάρει μόνο ~5m
+  m_known_radius   = 8;    // complementary coverage: skip 8m γύρω από known swimmers
+                           // (registered+scouted) → ο scout ψάχνει τα ΚΕΝΑ όπου κρύβονται
+                           // οι unreg. Μικρό (8m) → ΔΕΝ απέκλειε όλο το grid (no ταλάντωση,
+                           // όπως το παλιό 30m). Το rescue θα πάρει ούτως ή άλλως τους known.
+  m_inset          = 5;    // μικρό inset → καλύπτει ΟΛΟ το πεδίο μέχρι τις άκρες
+                           // (το OpRegionV24 κρατά το σκληρό όριο· 12m έκοβε τον νότο)
   m_obstacle_radius = 16;  // μη στοχεύεις waypoint <16m από buoy (αποφυγή stuck)
 
   m_pt_set = false;
@@ -356,6 +359,24 @@ void BHV_Scout::generateLawnmower()
         m_lawn_pts.push_back(XYPoint(x, ya));
       }
     }
+  }
+
+  // ΠΡΟΣΑΝΑΤΟΛΙΣΜΟΣ: ξεκίνα από την άκρη του region που είναι ΜΑΚΡΥΤΕΡΑ από το
+  // rescue (π.χ. δυτική) → κάλυψε ΠΡΩΤΑ τη ζώνη που το rescue φτάνει τελευταία/καθόλου.
+  // Βρες την πιο μακρινή κορυφή region από το rescue, και ξεκίνα το tour από το άκρο
+  // του lawnmower που είναι κοντύτερα σ' αυτήν (reverse αν χρειάζεται).
+  if(m_lawn_pts.size() >= 2) {
+    double refx = m_rescue_known ? m_rescue_x : m_osx;
+    double refy = m_rescue_known ? m_rescue_y : m_osy;
+    double fx = 0, fy = 0, fd = -1;
+    for(unsigned int i = 0; i < m_rescue_region.size(); i++) {
+      double d = hypot(m_rescue_region.get_vx(i)-refx, m_rescue_region.get_vy(i)-refy);
+      if(d > fd) { fd = d; fx = m_rescue_region.get_vx(i); fy = m_rescue_region.get_vy(i); }
+    }
+    double dfront = hypot(m_lawn_pts.front().x()-fx, m_lawn_pts.front().y()-fy);
+    double dback  = hypot(m_lawn_pts.back().x()-fx,  m_lawn_pts.back().y()-fy);
+    if(dback < dfront)
+      std::reverse(m_lawn_pts.begin(), m_lawn_pts.end());
   }
 
   postEventMessage("Lawnmower built: " + uintToString(m_lawn_pts.size())

@@ -52,6 +52,39 @@ class GenRescue : public AppCastingMOOSApp
    bool m_flyby_rescue;           // flyby (default OFF — A/B testing)
    bool m_cluster_split;          // cluster-based planning (default ON — anti-whipsaw, NO concede)
    double m_cluster_link_dist;    // single-linkage distance (m) για ομαδοποίηση swimmers
+   double m_buoy_block;           // swimmers <buoy_block από buoy → ΔΕΝ τους στοχεύουμε (loop avoidance)
+   double m_edge_block;           // swimmers <edge_block από το όριο → ΔΕΝ τους στοχεύουμε (επικίνδυνο)
+
+   // Inside-approach: swimmers κοντά στο όριο τους πλησιάζουμε ΑΠΟ ΜΕΣΑ (παρεμβολή
+   // approach-waypoint προς το κέντρο) → λιγότερο momentum προς τα έξω, λιγότερα freezes.
+   bool   m_inside_approach;
+   double m_approach_edge;        // swimmer <approach_edge από όριο → χρησιμοποίησε inside approach
+   double m_approach_dist;        // πόσο μέσα μπαίνει το approach-waypoint
+
+   // Enemy-pressure (legal shepherding): πλησιάζουμε εχθρό κοντά στο όριο ώστε η
+   // ΔΙΚΗ ΤΟΥ avoidance να τον σπρώξει εκτός. Καμία σύγκρουση (κρατάμε press_gap).
+   std::map<std::string, XYPoint> m_contacts;  // όνομα→θέση όλων των άλλων οχημάτων
+   std::string m_teammate;        // όνομα scout μας (εξαιρείται από εχθρούς)
+   bool   m_enemy_press;          // flag
+   double m_press_edge;           // enemy <press_edge από όριο → υποψήφιος
+   double m_press_range;          // μόνο αν είμαστε <press_range από τον enemy (opportunistic)
+   double m_press_gap;            // πόσο κοντά πλησιάζουμε (>collision range)
+
+   double m_press_dur;            // διάρκεια μιας σπρωξιάς (s)
+   double m_press_cd;             // cooldown πριν την επόμενη σπρωξιά (s)
+   double m_press_until;          // active press μέχρι αυτόν τον χρόνο
+   double m_press_cd_until;       // δεν ξεκινά νέα press πριν αυτόν τον χρόνο
+
+   // Self-defense: αν εχθρός μας στριμώχνει στο όριο, τραβιόμαστε προς το κέντρο
+   // (αποφυγή OpRegion halt/πάγωμα στην άκρη).
+   bool   m_self_defend;          // flag
+   double m_defend_edge;          // είμαστε <defend_edge από όριο → ευάλωτοι
+   double m_defend_range;         // εχθρός <defend_range από εμάς → απειλή
+   double m_defend_push;          // πόσο προς το κέντρο τραβιόμαστε
+   double m_defend_dur;           // διάρκεια μιας αμυντικής κίνησης (s)
+   double m_defend_cd;            // cooldown πριν την επόμενη (s)
+   double m_defend_until;
+   double m_defend_cd_until;
 
    // Deadlock-Escape state
    double m_stuck_ref_x;
